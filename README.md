@@ -15,3 +15,11 @@ az = 2
 x = ax/|a|  
 y = ay/|a|  
 z = az/|a|  
+
+### Degrees to Radians
+
+radians = (angle * π) / 180
+
+### Radians to Degrees
+
+degree = (angle * 180) / π
