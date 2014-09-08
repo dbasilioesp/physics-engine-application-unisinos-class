@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F2E18360-51F5-44F2-A558-D611EE456498}</ProjectGuid>
     <RootNamespace>Exercicio1Shapes</RootNamespace>
+    <ProjectName>Exercicio 01 - Shapes</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -44,7 +45,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>./%(AdditionalIncludeDirectories);../RenderLibrary;../GLUT;..;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./%(AdditionalIncludeDirectories);../Framework;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -66,12 +67,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RenderLibrary\RenderLibrary.vcxproj">
-      <Project>{135783e0-ade0-4254-8762-7072d35b99c3}</Project>
-    </ProjectReference>
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
+    <ProjectReference Include="..\Framework\Framework.vcxproj">
+      <Project>{f274e4c8-256f-42d7-8201-b910c1b1d7d1}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

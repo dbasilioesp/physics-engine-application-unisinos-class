@@ -49,6 +49,8 @@ public:
 
     void DrawAABB(b2AABB* aabb, const b2Color& color);
 
+	void DrawFixture(b2Fixture* fixture, b2Color color);
+
 };
 
 #endif

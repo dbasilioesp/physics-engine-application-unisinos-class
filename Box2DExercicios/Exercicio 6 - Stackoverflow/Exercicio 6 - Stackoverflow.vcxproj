@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6DFB141D-CEFD-4974-942E-52E93FCF0ED0}</ProjectGuid>
     <RootNamespace>Exercicio6Stackoverflow</RootNamespace>
+    <ProjectName>Exercicio 06 - Stackoverflow</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -64,12 +65,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RenderLibrary\RenderLibrary.vcxproj">
-      <Project>{135783e0-ade0-4254-8762-7072d35b99c3}</Project>
-    </ProjectReference>
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
+    <ProjectReference Include="..\Framework\Framework.vcxproj">
+      <Project>{f274e4c8-256f-42d7-8201-b910c1b1d7d1}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

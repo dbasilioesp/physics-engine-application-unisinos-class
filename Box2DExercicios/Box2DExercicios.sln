@@ -1,21 +1,29 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2012 for Windows Desktop
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderLibrary", "RenderLibrary\RenderLibrary.vcxproj", "{135783E0-ADE0-4254-8762-7072D35B99C3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 01 - Shapes", "Exercicio 1 - Shapes\Exercicio 1 - Shapes.vcxproj", "{F2E18360-51F5-44F2-A558-D611EE456498}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 1 - Shapes", "Exercicio 1 - Shapes\Exercicio 1 - Shapes.vcxproj", "{F2E18360-51F5-44F2-A558-D611EE456498}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 02 - Gravity", "Exercicio 2 - Gravity\Exercicio 2 - Gravity.vcxproj", "{B6D17BCB-8C1A-4A96-B8B5-1680BB07F51C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 2 - Gravity", "Exercicio 2 - Gravity\Exercicio 2 - Gravity.vcxproj", "{B6D17BCB-8C1A-4A96-B8B5-1680BB07F51C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 03 - Random Objects", "Exercicio 3 - Random Objects\Exercicio 3 - Random Objects.vcxproj", "{D7D001A5-73D6-456E-A90B-A12FC6AF6BBB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 3 - Random Objects", "Exercicio 3 - Random Objects\Exercicio 3 - Random Objects.vcxproj", "{D7D001A5-73D6-456E-A90B-A12FC6AF6BBB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 04 - Restitution", "Exercicio 4 - Restitution\Exercicio 4 - Restitution.vcxproj", "{217115EB-53D2-4180-B367-85A026F5B480}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 4 - Restitution", "Exercicio 4 - Restitution\Exercicio 4 - Restitution.vcxproj", "{217115EB-53D2-4180-B367-85A026F5B480}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 05 - Friction", "Exercicio 5 - Friction\Exercicio 5 - Friction.vcxproj", "{18ADC9EB-A917-41D3-B261-4AF01264FAB1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 5 - Friction", "Exercicio 5 - Friction\Exercicio 5 - Friction.vcxproj", "{18ADC9EB-A917-41D3-B261-4AF01264FAB1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 06 - Stackoverflow", "Exercicio 6 - Stackoverflow\Exercicio 6 - Stackoverflow.vcxproj", "{6DFB141D-CEFD-4974-942E-52E93FCF0ED0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 6 - Stackoverflow", "Exercicio 6 - Stackoverflow\Exercicio 6 - Stackoverflow.vcxproj", "{6DFB141D-CEFD-4974-942E-52E93FCF0ED0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 07 - Box Wall", "Exercicio 7 - Box Wall\Exercicio 7 - Box Wall.vcxproj", "{D2F57278-16A2-4F34-9656-381A3BF9642A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 7 - Box Wall", "Exercicio 7 - Box Wall\Exercicio 7 - Box Wall.vcxproj", "{D2F57278-16A2-4F34-9656-381A3BF9642A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 08 - Launch Boxes", "Exercicio 8 - Forces\Exercicio 8 - Forces.vcxproj", "{D7D9529B-939C-4F24-B812-88CA49BDA0C2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 09 - Domino", "Exercicio 9 - Domino\Exercicio 9 - Domino.vcxproj", "{24444D1E-CF42-4A36-9F28-A1CCAC1C1889}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Forcas", "Forcas\Forcas.vcxproj", "{C70E39AC-E094-403F-B830-E1AE16FFD1E9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Framework", "Framework\Framework.vcxproj", "{F274E4C8-256F-42D7-8201-B910C1B1D7D1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 10 - Move Objects", "Exercicio 10 - Move Objects\Exercicio 10 - Move Objects.vcxproj", "{6D46799F-6FAE-42DE-BAB0-5CE5BE79B767}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +31,6 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{135783E0-ADE0-4254-8762-7072D35B99C3}.Debug|Win32.ActiveCfg = Debug|Win32
-		{135783E0-ADE0-4254-8762-7072D35B99C3}.Debug|Win32.Build.0 = Debug|Win32
-		{135783E0-ADE0-4254-8762-7072D35B99C3}.Release|Win32.ActiveCfg = Release|Win32
-		{135783E0-ADE0-4254-8762-7072D35B99C3}.Release|Win32.Build.0 = Release|Win32
 		{F2E18360-51F5-44F2-A558-D611EE456498}.Debug|Win32.ActiveCfg = Debug|Win32
 		{F2E18360-51F5-44F2-A558-D611EE456498}.Debug|Win32.Build.0 = Debug|Win32
 		{F2E18360-51F5-44F2-A558-D611EE456498}.Release|Win32.ActiveCfg = Release|Win32
@@ -55,6 +59,26 @@ Global
 		{D2F57278-16A2-4F34-9656-381A3BF9642A}.Debug|Win32.Build.0 = Debug|Win32
 		{D2F57278-16A2-4F34-9656-381A3BF9642A}.Release|Win32.ActiveCfg = Release|Win32
 		{D2F57278-16A2-4F34-9656-381A3BF9642A}.Release|Win32.Build.0 = Release|Win32
+		{D7D9529B-939C-4F24-B812-88CA49BDA0C2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D7D9529B-939C-4F24-B812-88CA49BDA0C2}.Debug|Win32.Build.0 = Debug|Win32
+		{D7D9529B-939C-4F24-B812-88CA49BDA0C2}.Release|Win32.ActiveCfg = Release|Win32
+		{D7D9529B-939C-4F24-B812-88CA49BDA0C2}.Release|Win32.Build.0 = Release|Win32
+		{24444D1E-CF42-4A36-9F28-A1CCAC1C1889}.Debug|Win32.ActiveCfg = Debug|Win32
+		{24444D1E-CF42-4A36-9F28-A1CCAC1C1889}.Debug|Win32.Build.0 = Debug|Win32
+		{24444D1E-CF42-4A36-9F28-A1CCAC1C1889}.Release|Win32.ActiveCfg = Release|Win32
+		{24444D1E-CF42-4A36-9F28-A1CCAC1C1889}.Release|Win32.Build.0 = Release|Win32
+		{C70E39AC-E094-403F-B830-E1AE16FFD1E9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C70E39AC-E094-403F-B830-E1AE16FFD1E9}.Debug|Win32.Build.0 = Debug|Win32
+		{C70E39AC-E094-403F-B830-E1AE16FFD1E9}.Release|Win32.ActiveCfg = Release|Win32
+		{C70E39AC-E094-403F-B830-E1AE16FFD1E9}.Release|Win32.Build.0 = Release|Win32
+		{F274E4C8-256F-42D7-8201-B910C1B1D7D1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F274E4C8-256F-42D7-8201-B910C1B1D7D1}.Debug|Win32.Build.0 = Debug|Win32
+		{F274E4C8-256F-42D7-8201-B910C1B1D7D1}.Release|Win32.ActiveCfg = Release|Win32
+		{F274E4C8-256F-42D7-8201-B910C1B1D7D1}.Release|Win32.Build.0 = Release|Win32
+		{6D46799F-6FAE-42DE-BAB0-5CE5BE79B767}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6D46799F-6FAE-42DE-BAB0-5CE5BE79B767}.Debug|Win32.Build.0 = Debug|Win32
+		{6D46799F-6FAE-42DE-BAB0-5CE5BE79B767}.Release|Win32.ActiveCfg = Release|Win32
+		{6D46799F-6FAE-42DE-BAB0-5CE5BE79B767}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

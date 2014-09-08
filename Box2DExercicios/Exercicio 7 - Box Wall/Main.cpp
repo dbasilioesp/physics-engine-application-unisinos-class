@@ -1,31 +1,34 @@
-
 #include "Render.h"
+#include "ForceFunctions.h"
 #include <GL/glut.h>
-
 #include <cstdio>
 #include <iostream>
 
-//Algumas globais para interface e simulação
-int32 framePeriod = 16;
-int32 mainWindow;
+
+using namespace std;
+
+
+namespace
+{
+	int32 framePeriod = 16; //milliseconds
+	int32 height = 450;
+	int32 width = 450;
+	int32 mainWindow;
+	float32 timeStep;
+	int32 velocityIterations ;
+	int32 positionIterations ;
+	b2Vec2 viewCenter(0.0f, 0.0f);
+	b2World *world;
+	// Objeto com as rotinas de renderização dos objetos
+	DebugDraw renderer;
+};
+
 float scaleFactor;
-int altura=450, largura=450;
-float32 timeStep;
-int32 velocityIterations ;
-int32 positionIterations ;
 int tx, ty, tw, th;
-b2Vec2 viewCenter(0.0f, 0.0f);
 float32 viewZoom = 1.0f;
-
-// O objeto World serve para armazenar os dados da simulação --> MUNDO FÍSICO DA BOX2D
-b2World *world;
-
 //Alguns corpos rígidos
 b2Body *box1, *box2, *circle1, *circle2, *line1, *line2;
 b2Body* ground;
-
-//Objeto para a classe que faz o desenho das formas de colisão dos corpos rígidos
-DebugDraw renderer;
 
 
 //Resize callback -- GLUT
@@ -107,72 +110,6 @@ void PrintBodies()
 	}
 }
 
-//Função que chama as rotinas de desenho para cada fixture de um corpo rígido, de acordo com o tipo da forma de colisão dela e 
-void DrawFixture(b2Fixture* fixture, b2Color color)
-{
-		
-		const b2Transform& xf = fixture->GetBody()->GetTransform();
-
-		switch (fixture->GetType())
-		{
-		case b2Shape::e_circle:
-			{
-				b2CircleShape* circle = (b2CircleShape*)fixture->GetShape();
-
-				b2Vec2 center = b2Mul(xf, circle->m_p);
-				float32 radius = circle->m_radius;
-
-				renderer.DrawCircle(center, radius, color);
-			}
-			break;
-
-		case b2Shape::e_polygon:
-			{
-				b2PolygonShape* poly = (b2PolygonShape*)fixture->GetShape();
-				int32 vertexCount = poly->m_count;
-				b2Assert(vertexCount <= b2_maxPolygonVertices);
-				b2Vec2 vertices[b2_maxPolygonVertices];
-
-				for (int32 i = 0; i < vertexCount; ++i)
-				{
-					vertices[i] = b2Mul(xf, poly->m_vertices[i]);
-				}
-
-				renderer.DrawPolygon(vertices, vertexCount, color);
-			}
-		
-			break;
-		case b2Shape::e_edge:
-			{
-				b2EdgeShape* edge = (b2EdgeShape*)fixture->GetShape();
-				int32 vertexCount;
-				
-				b2Vec2 vertices[b2_maxPolygonVertices];
-				int i=0;
-
-				if (edge->m_hasVertex0) 
-				{
-						vertices[i] = b2Mul(xf, edge->m_vertex0);
-						i++;
-				}
-				vertices[i] = b2Mul(xf, edge->m_vertex1); i++;
-				vertices[i] = b2Mul(xf, edge->m_vertex2); i++;
-				if (edge->m_hasVertex3) 
-				{
-						vertices[i] = b2Mul(xf, edge->m_vertex3);
-						i++;
-				}
-				
-				vertexCount = i;
-				renderer.DrawPolygon(vertices, vertexCount, color);
-			}
-		
-			break;
-			
-		}
-	
-	}
-
 //Calback de rendering, que também chama o passo da simulação
 void SimulationLoop()
 {
@@ -193,7 +130,7 @@ void SimulationLoop()
 	//PERCORRE A LISTA DE CORPOS RÍGIDOS DO MUNDO E CHAMA A ROTINA DE DESENHO PARA A LISTA DE FIXTURES DE CADA UM
 	for(b = world->GetBodyList(); b; b=b->GetNext())
 	{
-		DrawFixture(b->GetFixtureList(),color);
+		renderer.DrawFixture(b->GetFixtureList(),color);
 	}
 		
 	glutSwapBuffers();
@@ -257,7 +194,8 @@ int main(int argc, char** argv)
 	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-	glutInitWindowSize(altura, largura);
+	glutInitWindowSize(width, height);
+	
 	char title[32];
 	sprintf(title, "Box2D Version %d.%d.%d", b2_version.major, b2_version.minor, b2_version.revision);
 	mainWindow = glutCreateWindow(title);

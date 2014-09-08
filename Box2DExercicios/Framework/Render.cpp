@@ -213,3 +213,69 @@ void DebugDraw::DrawAABB(b2AABB* aabb, const b2Color& c)
 	glVertex2f(aabb->lowerBound.x, aabb->upperBound.y);
 	glEnd();
 }
+
+// Rotina que chama os métodos de desenho da classe DebugDraw para desenhar os objetos da cena
+void DebugDraw::DrawFixture(b2Fixture* fixture, b2Color color)
+{
+		
+	const b2Transform& xf = fixture->GetBody()->GetTransform();
+
+	switch (fixture->GetType())
+	{
+	case b2Shape::e_circle:
+		{
+			b2CircleShape* circle = (b2CircleShape*)fixture->GetShape();
+
+			b2Vec2 center = b2Mul(xf, circle->m_p);
+			float32 radius = circle->m_radius;
+
+			DrawCircle(center, radius, color);
+		}
+		break;
+
+	case b2Shape::e_polygon:
+		{
+			b2PolygonShape* poly = (b2PolygonShape*)fixture->GetShape();
+			int32 vertexCount = poly->m_count;
+			b2Assert(vertexCount <= b2_maxPolygonVertices);
+			b2Vec2 vertices[b2_maxPolygonVertices];
+
+			for (int32 i = 0; i < vertexCount; ++i)
+			{
+				vertices[i] = b2Mul(xf, poly->m_vertices[i]);
+			}
+
+			DrawPolygon(vertices, vertexCount, color);
+		}
+		
+		break;
+	case b2Shape::e_edge:
+		{
+			b2EdgeShape* edge = (b2EdgeShape*)fixture->GetShape();
+			int32 vertexCount;
+				
+			b2Vec2 vertices[b2_maxPolygonVertices];
+			int i=0;
+
+			if (edge->m_hasVertex0) 
+			{
+					vertices[i] = b2Mul(xf, edge->m_vertex0);
+					i++;
+			}
+			vertices[i] = b2Mul(xf, edge->m_vertex1); i++;
+			vertices[i] = b2Mul(xf, edge->m_vertex2); i++;
+			if (edge->m_hasVertex3) 
+			{
+					vertices[i] = b2Mul(xf, edge->m_vertex3);
+					i++;
+			}
+				
+			vertexCount = i;
+			DrawPolygon(vertices, vertexCount, color);
+		}
+		
+		break;
+			
+	}
+	
+}
