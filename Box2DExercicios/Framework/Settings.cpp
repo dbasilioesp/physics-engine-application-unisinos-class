@@ -1,17 +1,12 @@
 #include "Settings.h"
 
 
-//Rotina de Callback de redimensionamento da janela 
-void ResizeWithProportion(int32 w, int32 h, GLdouble left, GLdouble right, GLdouble bottom, GLdouble top)
+void ResizeWithProportion(int32 width, int32 height, GLdouble left, GLdouble right, GLdouble bottom, GLdouble top)
 {
-	GLsizei width, height;
-
 	// Evita a divisao por zero
-	if(h == 0) h = 1;
+	if(height == 0) 
+		height = 1;
 
-	// Atualiza as variáveis
-	width = w;
-	height = h;
 	GLdouble aspectRadio = height/width;
 
 	// Especifica as dimensões da Viewport

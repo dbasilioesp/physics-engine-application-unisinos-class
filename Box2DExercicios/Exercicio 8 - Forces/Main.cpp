@@ -4,25 +4,42 @@
 #include <GL/glut.h>
 #include <cstdio>
 #include <iostream>
+#include <sstream>
 
 
 using namespace std;
 
 
-namespace
+int32 framePeriod = 16; //milliseconds
+int32 height = 450;
+int32 width = 450;
+int32 mainWindow;
+float32 timeStep;
+int32 velocityIterations ;
+int32 positionIterations ;
+b2Vec2 viewCenter(0.0f, 0.0f);
+b2World *world;
+DebugDraw renderer;  // Objeto com as rotinas de renderização dos objetos
+float lauchAngle = 45;
+b2Body *boxes[100];
+int counterBoxes = 0;
+
+
+
+void DesenhaLinhaGuia()
 {
-	int32 framePeriod = 16; //milliseconds
-	int32 height = 450;
-	int32 width = 450;
-	int32 mainWindow;
-	float32 timeStep;
-	int32 velocityIterations ;
-	int32 positionIterations ;
-	b2Vec2 viewCenter(0.0f, 0.0f);
-	b2World *world;
-	// Objeto com as rotinas de renderização dos objetos
-	DebugDraw renderer;
+		glColor3f(0,0,1);
+		b2Vec2 pInicial(-35,-35);
+		b2Vec2 pFinal = CalculaComponentesDoVetor(10.0, lauchAngle);
+
+		glLineWidth(3);
+		glBegin(GL_LINES);
+		glVertex2d(pInicial.x,pInicial.y);
+		glVertex2d(pInicial.x + pFinal.x, pInicial.y + pFinal.y);
+		glEnd();
+		glLineWidth(1);
 }
+
 
 //Rotina de Callback de redimensionamento da janela 
 void Resize(int32 w, int32 h)
@@ -126,6 +143,14 @@ void SimulationLoop()
 	{
 		renderer.DrawFixture(b->GetFixtureList(),color);
 	}
+
+	ostringstream aux1, aux2;  //incluir sstream
+	aux1 << "Angulo = " << lauchAngle;
+	renderer.DrawString(10,20,aux1.str().c_str());
+	aux2 << "Comandos: space, w, s ";
+	renderer.DrawString(10,40,aux2.str().c_str());
+
+	DesenhaLinhaGuia();
 		
 	glutSwapBuffers();
 
@@ -137,11 +162,30 @@ void Keyboard(unsigned char key, int x, int y)
 	switch (key){
 	case ' ':
 		{
-			b2Vec2 vectorForce;
-			b2Body * boxCreated = CreateBox(world, -35.0, -35.0, 8.0, 6.0, 3.0, 0.5, 0.5);
-			vectorForce = CalculaComponentesDoVetor(10000, 45);
-			boxCreated->ApplyForceToCenter(vectorForce, true);
+
+		boxes[counterBoxes] = CreateBox(world,-35,-35.0,2.0,2.0,1.0,0.5,0.5);
+		
+		b2Vec2 vetorForca;
+		vetorForca = CalculaComponentesDoVetor(1500, lauchAngle);
+		
+		boxes[counterBoxes]->ApplyForceToCenter(vetorForca,true);
+
+		if (counterBoxes < 99)
+			counterBoxes++;
+		else
+		{
+			for(int i = 0; i < counterBoxes; i++)
+				world->DestroyBody(boxes[i]);
+			counterBoxes = 0;
 		}
+
+		break;
+		}
+	case 'w':
+		lauchAngle += 1;
+		break;
+	case 's':
+		lauchAngle -= 1;
 		break;
     case 27: //Sai do programa
 		world->~b2World();
@@ -156,18 +200,16 @@ void Keyboard(unsigned char key, int x, int y)
 //Main :)
 int main(int argc, char** argv)
 {
+	char title[32];
+	sprintf(title, "Box2D Version %d.%d.%d -- Aprendendo Forças", b2_version.major, b2_version.minor, b2_version.revision);
 	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutInitWindowSize(height, width);
-	char title[32];
-	sprintf(title, "Box2D Version %d.%d.%d -- Aprendendo Forças", b2_version.major, b2_version.minor, b2_version.revision);
 	mainWindow = glutCreateWindow(title);
-
 	glutDisplayFunc(SimulationLoop);
 	glutReshapeFunc(Resize);
 	glutKeyboardFunc(Keyboard);
-	//Usa um timer para controlar o frame rate.
 	glutTimerFunc(framePeriod, Timer, 1);
 
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);

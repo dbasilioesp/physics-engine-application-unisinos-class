@@ -8,25 +8,19 @@
 using namespace std;
 
 
-namespace
-{
-	int32 framePeriod = 16; //milliseconds
-	int32 height = 450;
-	int32 width = 450;
-	int32 mainWindow;
-	float32 timeStep;
-	int32 velocityIterations ;
-	int32 positionIterations ;
-	b2Vec2 viewCenter(0.0f, 0.0f);
-	b2World *world;
-	// Objeto com as rotinas de renderização dos objetos
-	DebugDraw renderer;
-};
-
+int32 framePeriod = 16; //milliseconds
+int32 height = 450;
+int32 width = 450;
+int32 mainWindow;
+float32 timeStep;
+int32 velocityIterations ;
+int32 positionIterations ;
+b2Vec2 viewCenter(0.0f, 0.0f);
+b2World *world;
+DebugDraw renderer;  // Objeto com as rotinas de renderização dos objetos
 float scaleFactor;
 int tx, ty, tw, th;
 float32 viewZoom = 1.0f;
-//Alguns corpos rígidos
 b2Body *box1, *box2, *circle1, *circle2, *line1, *line2;
 b2Body* ground;
 
@@ -71,7 +65,6 @@ void Timer(int)
 //Função de inicialização da Box2D
 void InitBox2D()
 {
-
 	// Define the gravity vector.
 	b2Vec2 gravity(0.0f, -9.8f);
 
@@ -83,7 +76,6 @@ void InitBox2D()
     velocityIterations = 6;
     positionIterations = 2;
 	timeStep = 1.0f / 60.0f; //60 Hz
-
 }
 
 
@@ -95,21 +87,6 @@ void RunBox2D()
 }
 
 
-// Função que imprime todos os objetos  
-void PrintBodies()
-{
-	b2Body *b;
-	float ang;
-	b2Vec2 pos;
-	//PERCORRE A LISTA DE CORPOS RÍGIDOS DO MUNDO
-	for(b = world->GetBodyList(); b; b=b->GetNext())
-	{
-		pos = b->GetPosition();
-		ang = b->GetAngle();
-		printf("%4.2f %4.2f %4.2f\n", pos.x, pos.y, ang);	
-	}
-}
-
 //Calback de rendering, que também chama o passo da simulação
 void SimulationLoop()
 {
@@ -119,15 +96,13 @@ void SimulationLoop()
 	glLoadIdentity();
 
 	RunBox2D();
-	PrintBodies();
-
-	b2Body *b;
+	
 	glColor3f(1,0,0);
 	glPointSize(5);
 
 	b2Color color; color.r = 1.0; color.g = 0.0; color.b = 0.0;
 
-	//PERCORRE A LISTA DE CORPOS RÍGIDOS DO MUNDO E CHAMA A ROTINA DE DESENHO PARA A LISTA DE FIXTURES DE CADA UM
+	b2Body *b;
 	for(b = world->GetBodyList(); b; b=b->GetNext())
 	{
 		renderer.DrawFixture(b->GetFixtureList(),color);
@@ -217,7 +192,6 @@ int main(int argc, char** argv)
 		}
 	}
 
-	//Cria o chão
 	b2BodyDef bd;
 	ground = world->CreateBody(&bd);
 

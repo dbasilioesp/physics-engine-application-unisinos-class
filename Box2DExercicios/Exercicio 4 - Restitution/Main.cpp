@@ -1,11 +1,13 @@
-
 #include "Render.h"
 #include <GL/glut.h>
-
 #include <cstdio>
 #include <iostream>
+#include <sstream>
 
-//Algumas globais para interface e simulação
+
+using namespace std;
+
+
 int32 framePeriod = 16;
 int32 mainWindow;
 float scaleFactor;
@@ -13,18 +15,11 @@ int altura=450, largura=450;
 float32 timeStep;
 int32 velocityIterations ;
 int32 positionIterations ;
-int tx, ty, tw, th;
 b2Vec2 viewCenter(0.0f, 0.0f);
 float32 viewZoom = 1.0f;
 float32 restitution = 0.0;
-
-// O objeto World serve para armazenar os dados da simulação --> MUNDO FÍSICO DA BOX2D
 b2World *world;
-
-//Alguns corpos rígidos
 b2Body* ground;
-
-//Objeto para a classe que faz o desenho das formas de colisão dos corpos rígidos
 DebugDraw renderer;
 
 
@@ -99,7 +94,6 @@ void Timer(int)
 //Função de inicialização da Box2D
 void InitBox2D()
 {
-
 	// Define the gravity vector.
 	b2Vec2 gravity(0.0f, -9.8f);
 
@@ -123,21 +117,6 @@ void RunBox2D()
 }
 
 
-// Função que imprime todos os objetos  
-void PrintBodies()
-{
-	b2Body *b;
-	float ang;
-	b2Vec2 pos;
-	//PERCORRE A LISTA DE CORPOS RÍGIDOS DO MUNDO
-	for(b = world->GetBodyList(); b; b=b->GetNext())
-	{
-		pos = b->GetPosition();
-		ang = b->GetAngle();
-		printf("%4.2f %4.2f %4.2f\n", pos.x, pos.y, ang);	
-	}
-}
-
 //Calback de rendering, que também chama o passo da simulação
 void SimulationLoop()
 {
@@ -147,23 +126,23 @@ void SimulationLoop()
 	glLoadIdentity();
 
 	RunBox2D();
-	PrintBodies();
 
-	b2Body *b;
 	glColor3f(1,0,0);
 	glPointSize(5);
 
 	b2Color color; color.r = 1.0; color.g = 0.0; color.b = 0.0;
 
-	//PERCORRE A LISTA DE CORPOS RÍGIDOS DO MUNDO E CHAMA A ROTINA DE DESENHO PARA A LISTA DE FIXTURES DE CADA UM
+	b2Body *b;
 	for(b = world->GetBodyList(); b; b=b->GetNext())
 	{
 		renderer.DrawFixture(b->GetFixtureList(),color);
 	}
-		
-	glutSwapBuffers();
 
+	ostringstream aux1;  //incluir sstream
+	aux1 << "Comandos: b";
+	renderer.DrawString(10,20,aux1.str().c_str());
 	
+	glutSwapBuffers();
 }
 
 //Callback de teckado
@@ -183,12 +162,6 @@ void Keyboard(unsigned char key, int x, int y)
 }
 
 
-void Pause(int)
-{
-	//settings.pause = !settings.pause;
-}
-
-
 int main(int argc, char** argv)
 {
 	
@@ -198,7 +171,6 @@ int main(int argc, char** argv)
 	char title[32];
 	sprintf(title, "Box2D Version %d.%d.%d", b2_version.major, b2_version.minor, b2_version.revision);
 	mainWindow = glutCreateWindow(title);
-	//glutSetOption (GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 
 	glutDisplayFunc(SimulationLoop);
 
@@ -213,8 +185,6 @@ int main(int argc, char** argv)
 	//Cria o chão
 	b2BodyDef bd;
 	ground = world->CreateBody(&bd);
-
-	//Forma do chão: edge
 	b2EdgeShape shape;
 	shape.Set(b2Vec2(-39.5, -39.5), b2Vec2(39.5, -39.5));
 	ground->CreateFixture(&shape,1.0);

@@ -1,37 +1,22 @@
 #include "Render.h"
 #include <GL/glut.h>
-
 #include <cstdio>
 #include <iostream>
 
 
-int32 framePeriod = 16; //milliseconds
-int32 mainWindow;
-
 using namespace std;
 
+
+int32 framePeriod = 16; //milliseconds
+int32 mainWindow;
 int height=450, width=450;
 float32 timeStep;
 int32 velocityIterations ;
 int32 positionIterations ;
-
-int tx, ty, tw, th;
 b2Vec2 viewCenter(0.0f, 0.0f);
-
-// O objeto World serve para armazenar os dados da simulação
 b2World *world;
-
-//Objetos chão, paredes e teto
-b2Body* chao;
-b2Body* paredeEsquerda;
-b2Body* paredeDireita;
-b2Body* teto;
-
-//Objeto caixa
-b2Body *caixa;
-
-//Objeto com as rotinas de renderização dos objetos
 DebugDraw renderer;
+b2Body *box;
 
 //Estrutuda de dados que armazena o ponto do objeto onde a força foi aplicada e a força (vetor)
 struct forcaAplicada
@@ -332,23 +317,11 @@ void SimulationLoop()
 	RunBox2D();
 
 	//Define a cor dos objetos como vermelha
-	b2Color color; color.r = 1.0; color.g = 0.0; color.b = 0.0;
-	
-	//Desenha os objetos
-	if (chao != NULL)
-		DrawFixture(chao->GetFixtureList(),color);
-
-	if (paredeEsquerda != NULL)
-		DrawFixture(paredeEsquerda->GetFixtureList(),color);
-
-	if (paredeDireita != NULL)
-		DrawFixture(paredeDireita->GetFixtureList(),color);
-
-	if (teto != NULL)
-		DrawFixture(teto->GetFixtureList(),color);
-
-	if (caixa != NULL)
-		DrawFixture(caixa->GetFixtureList(),color);
+	b2Color color; color.r = 0.0; color.g = 0.0; color.b = 1.0;
+	b2Body *b;
+	for(b = world->GetBodyList(); b; b=b->GetNext()){
+		renderer.DrawFixture(b->GetFixtureList(),color);
+	}
 
 	//Desenha as forças aplicadas
 	DesenhaForcasAplicadas();
@@ -363,75 +336,51 @@ void Keyboard(unsigned char key, int x, int y)
 
 	switch (key)
 	{
-    //Aplica força sobre o corpo
-	case 'f':
+    case 'f':
 		{
-		b2Vec2 vetorForca;
-		vetorForca = CalculaComponentesDoVetor(10000, 110);
+			//Aplica força sobre o corpo
+			b2Vec2 vetorForca;
+			vetorForca = CalculaComponentesDoVetor(10000, 110);
 		
-		//Para aplicar a força no centro de massa do objeto
-		caixa->ApplyForceToCenter(vetorForca,true);
-		
-		AdicionaForcaAplicada(caixa->GetWorldCenter(),vetorForca);
-
-		//Para aplicar um impulso linear (quantidade de movimento gerada pela aplicação de uma força)...
-		//caixa->ApplyLinearImpulse(vetorForca,caixa->GetWorldCenter());
-		
-		//Para aplicar forças em outro ponto do objeto...
-		//b2Vec2 pontoLocal, pontoGlobal;
-		//Pega a posicao do ponto no mundo, dado um ponto fornecido em coordenadas locais (0,0) é o centro
-		/*pontoLocal.x = -3.0;
-		pontoLocal.y = 4.0;
-		pontoGlobal = caixa->GetWorldPoint(pontoLocal);		
-		ponto.x = caixa->GetWorldPoint(b2Vec2(-3.0,4.0)).x;
-		ponto.y = caixa->GetWorldPoint(b2Vec2(-3.0,4.0)).y;	
-		caixa->ApplyForce(vetorForca, pontoGlobal);
-		AdicionaForcaAplicada(pontoGlobal,vetorForca);*/
-
-		//Para aplicar um impulso linear...
-		//caixa->ApplyLinearImpulse(vetorForca,pontoGlobal);
-		
-		//b2Vec2 vetorVelocidade;
-		//vetorVelocidade = CalculaComponentesDoVetor(30,45);
-		//caixa->SetLinearVelocity(vetorVelocidade);
-
-		break;
+			//Para aplicar a força no centro de massa do objeto
+			box->ApplyForceToCenter(vetorForca,true);
+			AdicionaForcaAplicada(box->GetWorldCenter(),vetorForca);
+			break;
 		}
-    //Aplica torque sobre o corpo
-	case 't':
+    case 't':
 		{
+			//Aplica torque sobre o corpo
 			//Para aplicar um torque no objeto (girar ao redor do seu centro)
-			//caixa->ApplyTorque(1000);
-
+			box->ApplyTorque(1000, true);
 			//Para aplicar um impulso angular no objeto (quantidade de movimento gerado pela aplicação de um torque)
-			//caixa->ApplyAngularImpulse(-1000);
-		break;
+			box->ApplyAngularImpulse(-1000, true);
+			break;
 		}
-    //Sai do programa
 	case 27:
+		//Sai do programa
 		world->~b2World();
 		system("exit");
 		exit(0);
 		break;
 	}
+
 	glutPostRedisplay();
+
 }
 
 //Main :)
 int main(int argc, char** argv)
 {
-	
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-	glutInitWindowSize(height, width);
 	char title[32];
 	sprintf(title, "Box2D Version %d.%d.%d -- Aprendendo Forças", b2_version.major, b2_version.minor, b2_version.revision);
-	mainWindow = glutCreateWindow(title);
 
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
+	glutInitWindowSize(height, width);	
+	mainWindow = glutCreateWindow(title);
 	glutDisplayFunc(SimulationLoop);
 	glutReshapeFunc(Resize);
 	glutKeyboardFunc(Keyboard);
-	//Usa um timer para controlar o frame rate.
 	glutTimerFunc(framePeriod, Timer, 1);
 
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -440,31 +389,28 @@ int main(int argc, char** argv)
 	InitBox2D();
 
 	//Cria o chão
-	b2BodyDef bd;
-	chao = world->CreateBody(&bd);
-	//Forma do chão: edge
+	b2BodyDef bodyDef;
+	b2Body *chao = world->CreateBody(&bodyDef);
 	b2EdgeShape shape;
 	shape.Set(b2Vec2(-39.5, -39.5), b2Vec2(39.5, -39.5));
 	chao->CreateFixture(&shape,0.0);
 
 	//Cria o teto
-	teto = world->CreateBody(&bd);
+	b2Body *teto = world->CreateBody(&bodyDef);
 	shape.Set(b2Vec2(-39.5, 39.5), b2Vec2(39.5, 39.5));
 	teto->CreateFixture(&shape,0.0);
 
 	//Cria a parede esquerda
-	paredeEsquerda = world->CreateBody(&bd);
+	b2Body *paredeEsquerda = world->CreateBody(&bodyDef);
 	shape.Set(b2Vec2(-39.5, 39.5), b2Vec2(-39.5, -39.5));
 	paredeEsquerda->CreateFixture(&shape,0.0);
 
 	//Cria a parede direita
-	paredeDireita = world->CreateBody(&bd);
+	b2Body *paredeDireita = world->CreateBody(&bodyDef);
 	shape.Set(b2Vec2(39.5, 39.5), b2Vec2(39.5, -39.5));
 	paredeDireita->CreateFixture(&shape,0.0);
 
-
-	//Cria uma caixa na posicao (0,0), com 8m de altura, 6m de largura, 3kg, coeficiente de atrito e restituição 0.5
-	caixa = criaCaixa(0.0, 0.0, 8.0,6.0,3.0,0.5,0.5);
+	box = criaCaixa(0.0, 0.0, 8.0,6.0,3.0,0.5,0.5);
 
 	glutMainLoop();
 

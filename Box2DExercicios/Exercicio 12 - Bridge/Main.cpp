@@ -19,11 +19,81 @@ float32 timeStep;
 int32 velocityIterations ;
 int32 positionIterations ;
 b2Vec2 viewCenter(0.0f, 0.0f);
-b2World *world;
+b2World *world;  
 DebugDraw renderer;  // Objeto com as rotinas de renderização dos objetos
 b2Body *bodySelected;
 vector<b2Body*> bodies;
 int32 selectedIndex = 0;
+vector<b2Joint*> joints;
+
+
+void CreateBridge()
+{
+	b2Body *leftBox = CreateBox(world, -18.0, -35.0, 10.0, 10.0, 1.0, 0.5, 0.5);
+	leftBox->SetType(b2_staticBody);
+	b2Body *rightBox = CreateBox(world, 18.0, -35.0, 10.0, 10.0, 1.0, 0.5, 0.5);
+	rightBox->SetType(b2_staticBody);
+
+	vector<b2Body*> blocks;
+	for (int i = 0; i < 5; i++){
+		blocks.push_back(
+			CreateBox(world, -10.0 + i*5, -31.0, 5.0, 2.0, 1.0, 0.5, 0.5)
+		);
+	}
+	
+	{
+		b2RevoluteJointDef rJointDef;
+		rJointDef.Initialize(leftBox, blocks[0], leftBox->GetWorldPoint(b2Vec2(5.0, 5.0)));
+		rJointDef.collideConnected = true;
+		
+		joints.push_back(
+			world->CreateJoint(&rJointDef)
+		);
+	}
+
+	{
+		b2RevoluteJointDef rJointDef;
+		int last = blocks.size() - 1;
+		rJointDef.Initialize(rightBox, blocks[last], rightBox->GetWorldPoint(b2Vec2(-5.0, 5.0)));
+		rJointDef.collideConnected = true;
+		
+		joints.push_back(
+			world->CreateJoint(&rJointDef)
+		);
+	}
+
+	for (int i = 0; i < blocks.size(); i++)
+	{
+		if(i+1 >= blocks.size())
+			break;
+
+		b2RevoluteJointDef rJointDef;
+		rJointDef.Initialize(blocks[i], blocks[i+1], blocks[i]->GetWorldPoint(b2Vec2(2.5, 0.0)));
+		rJointDef.collideConnected = true;
+
+		joints.push_back(
+			world->CreateJoint(&rJointDef)
+		);
+	}
+
+}
+
+
+void DrawJoint( b2Joint *joint, b2Color color)
+{
+	b2Vec2 anchor1, anchor2;
+	anchor1 = joint->GetAnchorA();
+	anchor2 = joint->GetAnchorB();
+
+	glPointSize(5);
+	glBegin(GL_POINTS);
+	glVertex2f(anchor1.x,anchor1.y);
+	glVertex2f(anchor2.x,anchor2.y);
+	glEnd();
+	glPointSize(1);
+
+	renderer.DrawSegment(anchor1, anchor2, color);
+}
 
 
 //Rotina de Callback de redimensionamento da janela 
@@ -36,14 +106,10 @@ void Resize(int32 w, int32 h)
 //Função de inicialização da Box2D
 void InitBox2D()
 {
-	// Define the gravity vector.
 	b2Vec2 gravity(0.0f, -9.8f);
 
-	// Inicializa a biblioteca Box2D
 	world = new b2World(gravity);
 
-	// Define os parâmetro para a simulação
-	// Quanto maior, mais preciso, porém, mais lento
     velocityIterations = 8;
     positionIterations = 3;
 	timeStep = 1.0f / 60.0f;
@@ -56,7 +122,6 @@ void RunBox2D()
 	world->ClearForces();
 }
 
-
 // Callback de temporizador da GLUT (pra não ficar muito rápido)
 void Timer(int)
 {
@@ -65,7 +130,7 @@ void Timer(int)
 	glutTimerFunc(framePeriod, Timer, 1);
 }
 
-//Callback de desenho da GLUT, nela é chamada a rotina que chama o passo da simulação
+// Callback de desenho da GLUT, nela é chamada a rotina que chama o passo da simulação
 void SimulationLoop()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -81,11 +146,13 @@ void SimulationLoop()
 	b2Color color; color.r = 1.0; color.g = 0.0; color.b = 0.0;
 
 	b2Body *b;
-	for(b = world->GetBodyList(); b; b=b->GetNext())
-	{
+	for(b = world->GetBodyList(); b; b=b->GetNext()){
 		renderer.DrawFixture(b->GetFixtureList(),color);
 	}
-		
+
+	for (int i = 0; i < joints.size(); i++)
+		DrawJoint(joints[i], color);
+	
 	glutSwapBuffers();
 
 }
@@ -93,67 +160,13 @@ void SimulationLoop()
 // Rotina de callback de teclado da GLUT
 void Keyboard(unsigned char key, int x, int y)
 {
-	b2Body *body;
-	b2Vec2 force;
-	int32 size;
-
 	switch (key)
 	{
-	case 'b':
-		body = CreateBox(world, 0.0, 0.0, 7.0, 7.0, 3.0, 0.5, 0.5);
-		if(bodySelected == NULL)
-			bodySelected = body;
-		bodies.push_back(body);
-		break;
-	case 'c':
-		body = CreateCircle(world, 0.0, 0.0, 3.0f, 0.7f);
-		if(bodySelected == NULL)
-			bodySelected = body;
-		bodies.push_back(body);
-		break;
-	case 'n':
-		size = bodies.size();
-		if(size > 0){
-			if(selectedIndex >= size){
-				selectedIndex = 0;
-				bodySelected = bodies[0];
-			}else{
-				for (int i = 0; i < size; i++){
-					if(i == selectedIndex){
-						bodySelected = bodies[i];
-						selectedIndex += 1;
-						break;
-					}
-				}
-			}
-		}
-		break;
-    //Sai do programa
-	case 27:
-		world->~b2World();
-		system("exit");
-		exit(0);
-		break;
-	}
-
-	if(bodySelected != NULL){
-		switch(key)
+    case 27:  //Sai do programa
 		{
-		case 'w':
-			force = CalculaComponentesDoVetor(1000, 90);
-			bodySelected->ApplyForceToCenter(force, true);
-			break;
-		case 's':
-			force = CalculaComponentesDoVetor(1000, -90);
-			bodySelected->ApplyForceToCenter(force, true);
-			break;
-		case 'd':
-			force = CalculaComponentesDoVetor(1000, 0);
-			bodySelected->ApplyForceToCenter(force, true);
-			break;
-		case 'a':
-			force = CalculaComponentesDoVetor(1000, 180);
-			bodySelected->ApplyForceToCenter(force, true);
+			world->~b2World();
+			system("exit");
+			exit(0);
 			break;
 		}
 	}
@@ -164,26 +177,24 @@ void Keyboard(unsigned char key, int x, int y)
 //Main :)
 int main(int argc, char** argv)
 {
-	
+	char title[32];
+	sprintf(title, "Box2D Version %d.%d.%d", b2_version.major, b2_version.minor, b2_version.revision);
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutInitWindowSize(height, width);
-	char title[32];
-	sprintf(title, "Box2D Version %d.%d.%d -- Aprendendo Forças", b2_version.major, b2_version.minor, b2_version.revision);
 	mainWindow = glutCreateWindow(title);
-
 	glutDisplayFunc(SimulationLoop);
 	glutReshapeFunc(Resize);
 	glutKeyboardFunc(Keyboard);
-	//Usa um timer para controlar o frame rate.
-	glutTimerFunc(framePeriod, Timer, 1);
+	glutTimerFunc(framePeriod, Timer, 1);  //Usa um timer para controlar o frame rate.
 
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	//Rotina com a inicialização do mundo
 	InitBox2D();
 
 	Create4Walls(world);
-	
+	CreateBridge();
+
 	glutMainLoop();
 
 	return 0;

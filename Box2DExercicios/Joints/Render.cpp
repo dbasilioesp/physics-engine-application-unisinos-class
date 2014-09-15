@@ -16,12 +16,14 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "Render.h"
-#include <GL/glut.h>
-#include <stdio.h>
-#include <stdarg.h>
 
+#include <GL/glut.h>
+
+#include <cstdio>
+#include <cstdarg>
+#include <cstring>
+using namespace std;
 
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
@@ -170,35 +172,13 @@ void DebugDraw::DrawString(int x, int y, const char *string, ...)
 	int32 length = (int32)strlen(buffer);
 	for (int32 i = 0; i < length; ++i)
 	{
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, buffer[i]);
-		//glutBitmapCharacter(GLUT_BITMAP_9_BY_15, buffer[i]);
+		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, buffer[i]);
 	}
 
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
-}
-
-void DebugDraw::DrawString(const b2Vec2& p, const char *string, ...)
-{
-	char buffer[128];
-
-	va_list arg;
-	va_start(arg, string);
-	vsprintf(buffer, string, arg);
-	va_end(arg);
-
-	glColor3f(0.5f, 0.9f, 0.5f);
-	glRasterPos2f(p.x, p.y);
-
-	int32 length = (int32)strlen(buffer);
-	for (int32 i = 0; i < length; ++i)
-	{
-		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, buffer[i]);
-	}
-
-	glPopMatrix();
 }
 
 void DebugDraw::DrawAABB(b2AABB* aabb, const b2Color& c)
@@ -210,70 +190,4 @@ void DebugDraw::DrawAABB(b2AABB* aabb, const b2Color& c)
 	glVertex2f(aabb->upperBound.x, aabb->upperBound.y);
 	glVertex2f(aabb->lowerBound.x, aabb->upperBound.y);
 	glEnd();
-}
-
-// Rotina que chama os métodos de desenho da classe DebugDraw para desenhar os objetos da cena
-void DebugDraw::DrawFixture(b2Fixture* fixture, b2Color color)
-{
-		
-	const b2Transform& xf = fixture->GetBody()->GetTransform();
-
-	switch (fixture->GetType())
-	{
-	case b2Shape::e_circle:
-		{
-			b2CircleShape* circle = (b2CircleShape*)fixture->GetShape();
-
-			b2Vec2 center = b2Mul(xf, circle->m_p);
-			float32 radius = circle->m_radius;
-
-			DrawCircle(center, radius, color);
-		}
-		break;
-
-	case b2Shape::e_polygon:
-		{
-			b2PolygonShape* poly = (b2PolygonShape*)fixture->GetShape();
-			int32 vertexCount = poly->m_count;
-			b2Assert(vertexCount <= b2_maxPolygonVertices);
-			b2Vec2 vertices[b2_maxPolygonVertices];
-
-			for (int32 i = 0; i < vertexCount; ++i)
-			{
-				vertices[i] = b2Mul(xf, poly->m_vertices[i]);
-			}
-
-			DrawPolygon(vertices, vertexCount, color);
-		}
-		
-		break;
-	case b2Shape::e_edge:
-		{
-			b2EdgeShape* edge = (b2EdgeShape*)fixture->GetShape();
-			int32 vertexCount;
-				
-			b2Vec2 vertices[b2_maxPolygonVertices];
-			int i=0;
-
-			if (edge->m_hasVertex0) 
-			{
-					vertices[i] = b2Mul(xf, edge->m_vertex0);
-					i++;
-			}
-			vertices[i] = b2Mul(xf, edge->m_vertex1); i++;
-			vertices[i] = b2Mul(xf, edge->m_vertex2); i++;
-			if (edge->m_hasVertex3) 
-			{
-					vertices[i] = b2Mul(xf, edge->m_vertex3);
-					i++;
-			}
-				
-			vertexCount = i;
-			DrawPolygon(vertices, vertexCount, color);
-		}
-		
-		break;
-			
-	}
-	
 }
