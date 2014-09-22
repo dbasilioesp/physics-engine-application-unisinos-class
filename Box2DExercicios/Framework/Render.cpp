@@ -180,6 +180,39 @@ void DebugDraw::DrawString(int x, int y, const char *string, ...)
 	glMatrixMode(GL_MODELVIEW);
 }
 
+void DebugDraw::DrawString(int x, int y, b2Color color, const char *string, ...)
+{
+	char buffer[128];
+
+	va_list arg;
+	va_start(arg, string);
+	vsprintf(buffer, string, arg);
+	va_end(arg);
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	int w = glutGet(GLUT_WINDOW_WIDTH);
+	int h = glutGet(GLUT_WINDOW_HEIGHT);
+	gluOrtho2D(0, w, h, 0);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glColor3f(color.r, color.b,color.b);
+	glRasterPos2i(x, y);
+	int32 length = (int32)strlen(buffer);
+	for (int32 i = 0; i < length; ++i)
+	{
+		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, buffer[i]);
+	}
+
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+}
+
 void DebugDraw::DrawString(const b2Vec2& p, const char *string, ...)
 {
 	char buffer[128];

@@ -16,8 +16,8 @@ int32 height = 450;
 int32 width = 450;
 int32 mainWindow;
 float32 timeStep;
-int32 velocityIterations ;
-int32 positionIterations ;
+int32 velocityIterations;
+int32 positionIterations;
 b2Vec2 viewCenter(0.0f, 0.0f);
 b2World *world;  
 DebugDraw renderer;  // Objeto com as rotinas de renderização dos objetos

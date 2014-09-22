@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{637A3C36-76F7-45F6-9C3C-3D652D4C8326}</ProjectGuid>
-    <RootNamespace>Joints</RootNamespace>
+    <ProjectGuid>{57A1E844-78A7-4331-8A7D-07AC131AC733}</ProjectGuid>
+    <RootNamespace>MyAngryBirds</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -64,12 +64,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Render.h" />
-    <ClInclude Include="RotinasAuxiliares.h" />
+    <ProjectReference Include="..\Framework\Framework.vcxproj">
+      <Project>{f274e4c8-256f-42d7-8201-b910c1b1d7d1}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Render.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

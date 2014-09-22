@@ -31,6 +31,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 11 - Robot", "Exe
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 12 - Bridge", "Exercicio 12 - Bridge\Exercicio 12 - Bridge.vcxproj", "{198D3DAC-1740-4C6B-85FF-797AA8553E5C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Contacts", "Contacts\Contacts.vcxproj", "{9FA685A8-79FB-4CEB-A331-1025EEC64340}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyAngryBirds", "MyAngryBirds\MyAngryBirds.vcxproj", "{57A1E844-78A7-4331-8A7D-07AC131AC733}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -97,6 +101,14 @@ Global
 		{198D3DAC-1740-4C6B-85FF-797AA8553E5C}.Debug|Win32.Build.0 = Debug|Win32
 		{198D3DAC-1740-4C6B-85FF-797AA8553E5C}.Release|Win32.ActiveCfg = Release|Win32
 		{198D3DAC-1740-4C6B-85FF-797AA8553E5C}.Release|Win32.Build.0 = Release|Win32
+		{9FA685A8-79FB-4CEB-A331-1025EEC64340}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9FA685A8-79FB-4CEB-A331-1025EEC64340}.Debug|Win32.Build.0 = Debug|Win32
+		{9FA685A8-79FB-4CEB-A331-1025EEC64340}.Release|Win32.ActiveCfg = Release|Win32
+		{9FA685A8-79FB-4CEB-A331-1025EEC64340}.Release|Win32.Build.0 = Release|Win32
+		{57A1E844-78A7-4331-8A7D-07AC131AC733}.Debug|Win32.ActiveCfg = Debug|Win32
+		{57A1E844-78A7-4331-8A7D-07AC131AC733}.Debug|Win32.Build.0 = Debug|Win32
+		{57A1E844-78A7-4331-8A7D-07AC131AC733}.Release|Win32.ActiveCfg = Release|Win32
+		{57A1E844-78A7-4331-8A7D-07AC131AC733}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

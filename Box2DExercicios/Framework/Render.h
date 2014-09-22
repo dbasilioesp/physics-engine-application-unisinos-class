@@ -45,6 +45,8 @@ public:
 
     void DrawString(int x, int y, const char* string, ...); 
 
+	void DrawString(int x, int y, b2Color color, const char* string, ...);
+
     void DrawString(const b2Vec2& p, const char* string, ...);
 
     void DrawAABB(b2AABB* aabb, const b2Color& color);

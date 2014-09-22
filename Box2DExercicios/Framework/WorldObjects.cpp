@@ -1,35 +1,35 @@
 #include "WorldObjects.h"
 
 
-void Create4Walls(b2World *world){
+void Create4Walls(b2World *world, float width, float height){
 
 	b2BodyDef bodyDef;
 	b2EdgeShape edgeShape;
 
 	{
 		//Cria o chão
-		edgeShape.Set(b2Vec2(-39.5, -39.5), b2Vec2(39.5, -39.5));
+		edgeShape.Set(b2Vec2(-width, -height), b2Vec2(width, -height));
 		b2Body *ground = world->CreateBody(&bodyDef);
 		ground->CreateFixture(&edgeShape,0.0);
 	}
 	
 	{
 		//Cria o teto
-		edgeShape.Set(b2Vec2(-39.5, 39.5), b2Vec2(39.5, 39.5));
+		edgeShape.Set(b2Vec2(-width, height), b2Vec2(width, height));
 		b2Body *roof = world->CreateBody(&bodyDef);
 		roof->CreateFixture(&edgeShape,0.0);
 	}
 
 	{
 		//Cria a parede esquerda
-		edgeShape.Set(b2Vec2(-39.5, 39.5), b2Vec2(-39.5, -39.5));
+		edgeShape.Set(b2Vec2(-width, height), b2Vec2(-width, -height));
 		b2Body *leftWall = world->CreateBody(&bodyDef);
 		leftWall->CreateFixture(&edgeShape,0.0);
 	}
 
 	{
 		//Cria a parede direita
-		edgeShape.Set(b2Vec2(39.5, 39.5), b2Vec2(39.5, -39.5));
+		edgeShape.Set(b2Vec2(width, height), b2Vec2(width, -height));
 		b2Body *rightWall = world->CreateBody(&bodyDef);
 		rightWall->CreateFixture(&edgeShape,0.0);
 	}
@@ -37,7 +37,8 @@ void Create4Walls(b2World *world){
 }
 
 
-b2Body *CreateBox(b2World *world, float posX, float posY, float width, float height, float massa, float coefatrito, float coefrestituicao)
+b2Body *CreateBox(b2World *world, float posX, float posY, float width, float height, 
+				  float density, float friction, float restitution)
 {
 	b2BodyDef bodyDef;
 	bodyDef.position.Set(posX,posY);
@@ -48,9 +49,9 @@ b2Body *CreateBox(b2World *world, float posX, float posY, float width, float hei
 	
 	b2FixtureDef f;
 	f.shape = &box;
-	f.density = massa/(width*width);
-	f.friction = coefatrito;
-	f.restitution = coefrestituicao;
+	f.density = density/(width*width);
+	f.friction = friction;
+	f.restitution = restitution;
 
 	b2Body *object;
 	object = world->CreateBody(&bodyDef);
@@ -72,7 +73,8 @@ b2Body *CreateCircle(b2World *world, float posX, float posY, float32 radius,
 
 	b2FixtureDef fixture;
 	fixture.shape = &shape;
-	fixture.density = density;
+	float area = b2_pi * radius * radius;
+	fixture.density = density/area;
 	fixture.friction = friction;
 	fixture.restitution = restitution;
 
