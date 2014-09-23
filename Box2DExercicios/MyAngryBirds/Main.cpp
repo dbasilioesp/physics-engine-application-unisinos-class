@@ -31,7 +31,6 @@ public:
 };
 
 
-
 int32 mainWindow;
 b2World *world;
 int height=320, width=700;
@@ -40,24 +39,76 @@ float32 timeStep;
 int32 velocityIterations;
 int32 positionIterations;
 DebugDraw renderer;
-b2Vec2 mouseWorld;
-b2MouseJoint* mouseJoint;
 Laucher laucher;
 MyContactListener contactListener;
 vector <b2Body *> birds;
 vector <b2Body *> pigs;
 vector <float> pigsHealth;
 vector <int> pigsToDie;
-int deadPigsCount = 0;
-int maxBirds = 5;
-bool screenGameOver = false;
-bool screenWinner = false;
+bool screenGameOver;
+bool screenWinner;
+int deadPigsCount;
+int maxBirds;
+int score;
+int highscore;
+
+
+void Phase1(){
+
+	screenGameOver = false;
+	screenWinner = false;
+	deadPigsCount = 0;
+	maxBirds = 1;
+	score = 0;
+
+	Create4Walls(world, 87.0, 39.5f);
+
+	// 10 Pigs
+	float xi = 0.0;
+	float yi = -36.0;
+	for (int i=0; i < 10;i++)
+	{
+		pigs.push_back(CreateCircle(world, 0.0,yi,3.5,2.0,0.2,0.2));
+		pigsHealth.push_back(1.0); //todos os porquinhos começam saudáveis
+		yi+=7.0; //2*raio do círculo, para posicioná-los corretamente
+	}
+
+	pigsToDie.resize(pigs.size());
+
+}
+
+
+void DrawHeadsUpDisplay(){
+
+	//Define a cor do texto como preta
+	b2Color color; color.r = 0.0; color.g = 0.0; color.b = 0.0;
+
+	//Imprimindo dados da simulação
+	int32 bodyCount = world->GetBodyCount();
+	int32 contactCount = world->GetContactCount();
+	int32 jointCount = world->GetJointCount();
+	renderer.DrawString(5, 15, color,"bodies/contacts/joints= %d/%d/%d", bodyCount, contactCount, jointCount);
+	renderer.DrawString(5, 30, color,"birds/pigs = %d/%d", birds.size(), pigs.size()-deadPigsCount);
+
+	if(screenGameOver){
+		renderer.DrawString((width/2)-35, height/2, color, "GAME OVER");
+		renderer.DrawString((width/2)-65, (height/2)+20, color, "Press R to restart");
+	}
+
+	if(screenWinner){
+		renderer.DrawString((width/2)-35, height/2, color, "YOU WIN!");
+		renderer.DrawString((width/2)-65, (height/2)+20, color, "Press R to restart");
+	}
+
+	renderer.DrawString(width-160, 25, color, "High Score: %d", highscore);
+	renderer.DrawString(width-120, 45, color, "Score: %d", score);
+}
+
+
 
 //Rotina de Callback de redimensionamento da janela 
 void Resize(int32 w, int32 h)
 {
-	
-
 	// Evita a divisao por zero
 	if(h == 0) h = 1;
 
@@ -127,7 +178,7 @@ void Timer(int)
 }
 
 
-void DesenhaLinhaGuia()
+void DrawGuideLine()
 {
 	glColor3f(0, 0, 1);
 	b2Vec2 pInicial(laucher.x, laucher.y);
@@ -156,29 +207,16 @@ void SimulationLoop()
 	//Chama a rotina que chama o passo da simulação
 	RunBox2D();
 
-	//Define a cor do texto como preta
-	b2Color color; color.r = 0.0; color.g = 0.0; color.b = 0.0;
+	DrawHeadsUpDisplay();
 
-	//Imprimindo dados da simulação
-	int32 bodyCount = world->GetBodyCount();
-	int32 contactCount = world->GetContactCount();
-	int32 jointCount = world->GetJointCount();
-	renderer.DrawString(5, 15, color,"bodies/contacts/joints= %d/%d/%d", bodyCount, contactCount, jointCount);
-	renderer.DrawString(5, 30, color,"birds/pigs = %d/%d", birds.size(), pigs.size()-deadPigsCount);
+	if(birds.size() > 0)
+		cout << "Angular Velocity: " << birds[birds.size()-1]->GetAngularVelocity() << endl;
 	
-	if(birds.size() >= maxBirds && pigs.size() > deadPigsCount){
+	if(birds.size() >= maxBirds && pigs.size() > deadPigsCount && !birds[birds.size()-1]->IsAwake()){
 		screenGameOver = true;
 	}
 
-	if(screenGameOver){
-		renderer.DrawString((width/2)-35, height/2, color, "GAME OVER");
-		renderer.DrawString((width/2)-65, (height/2)+20, color, "Press R to restart");
-	}
-
-	if(screenWinner){
-		renderer.DrawString((width/2)-35, height/2, color, "YOU WIN!");
-		renderer.DrawString((width/2)-65, (height/2)+20, color, "Press R to restart");
-	}
+	b2Color color;
 
 	//Define a cor dos objetos como vermelha
 	color.r = 1.0; color.g = 0.0; color.b = 0.0;
@@ -187,21 +225,21 @@ void SimulationLoop()
 		renderer.DrawFixture(b->GetFixtureList(),color);
 	}
 
-	//Desenha os passarinhos
+	// Draw birds
 	color.r = 0.0; color.g = 1.0; color.b = 1.0;	
 	for (int i=0; i < birds.size(); i++) 
 		renderer.DrawFixture(birds[i]->GetFixtureList(), color);
 
-	//Desenha os pigs
+	// Draw pigs
 	color.r = 0.0; color.g = 0.8; color.b = 0.0;
 	for (int i=0; i < pigs.size(); i++) {
 		if (pigs[i] != NULL)
 			renderer.DrawFixture(pigs[i]->GetFixtureList(),color);
 	}
 
-	DesenhaLinhaGuia();
+	DrawGuideLine();
 	
-	//Para desenhar os pontos de contatos
+	// Draw Contact Points
 	color.r = 1.0; color.g = 0.0; color.b = 1.0;
 	b2Contact * contact = world->GetContactList();
 	for (int i=0; i < world->GetContactCount(); i++)
@@ -214,15 +252,15 @@ void SimulationLoop()
 		contact = contact->GetNext();
 	}
 
-	//Verifica a colisão entre pássaros e pigs
+	// Contacts between birds and pigs
 	contact = world->GetContactList();
-	for (int i=0; i<world->GetContactCount(); i++)
+	for (int i=0; i < world->GetContactCount(); i++)
 	{
 		contactListener.BeginContact(contact);
 		contact = contact->GetNext();
 	}
 
-	//Depois de percorrer a lista de contatos, destruir os corpos dos pigs mortos
+	// Destroy dead pigs
 	for(int i=0; i < pigsToDie.size(); i++)
 	{
 		int pigIndex = pigsToDie[i];
@@ -270,6 +308,7 @@ void Keyboard(unsigned char key, int x, int y)
 
 	case 'r':
 		ResetGame();
+		Phase1();
 		break;
 
 	//Sai do programa
@@ -322,18 +361,7 @@ int main(int argc, char** argv)
 	//Rotina com a inicialização do mundo
 	InitBox2D();
 
-	Create4Walls(world, 87.0, 39.5f);
-
-	// Criando 10 porquinhos
-	float xi = 0.0;
-	float yi = -36.0;
-	for (int i=0; i<10;i++)
-	{
-		pigs.push_back(CreateCircle(world, 0.0,yi,3.5,2.0,0.2,0.2));
-		pigsHealth.push_back(1.0); //todos os porquinhos começam saudáveis
-		yi+=7.0; //2*raio do círculo, para posicioná-los corretamente
-	}
-	pigsToDie.resize(pigs.size());
+	Phase1();
 
 	glutMainLoop();
 
@@ -392,6 +420,7 @@ void MyContactListener::BeginContact(b2Contact* contact)
 		if (pigsHealth[pigIndex] < 0.0){
 			//acabou a saude, mata porco
 			pigsToDie.push_back(pigIndex);
+			score += 5000;
 		}
 	}
 }
