@@ -78,8 +78,8 @@ public:
 
 		// Provoca dano no porco
 		if( (typeA == 'b'  && typeB == 'p') || (typeB == 'b'  && typeA == 'p')){
-
-			pigsHealth[pigIndex] -= 0.025;
+			
+			pigsHealth[pigIndex] -= 0.25;
 
 			if (pigsHealth[pigIndex] < 0.0){
 				//acabou a saude, mata porco
@@ -302,6 +302,8 @@ void InitBox2D()
 	// Inicializa a biblioteca Box2D
 	world = new b2World(gravity);
 
+	world->SetContactListener(&contactListener);
+
 	// Define os parâmetro para a simulação
 	// Quanto maior, mais preciso, porém, mais lento
     velocityIterations = 8;
@@ -500,18 +502,8 @@ void SimulationLoop()
 		b2WorldManifold worldManifold;
 		contact->GetWorldManifold(&worldManifold);
 		b2Vec2 p = worldManifold.points[0];
-		renderer.DrawPoint(p,4,color);
+		renderer.DrawPoint(p, 4, color);
 		
-		contact = contact->GetNext();
-	}
-
-	//cout << "Desenhou os contatos \n";
-	//system("pause");
-	//Verifica a colisão entre pássaros e pigs
-	contact = world->GetContactList();
-	for (int i=0; i<world->GetContactCount(); i++)
-	{
-		contactListener.BeginContact(contact);
 		contact = contact->GetNext();
 	}
 

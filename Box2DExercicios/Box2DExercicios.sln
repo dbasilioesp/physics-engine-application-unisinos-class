@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Windows Desktop
+# Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 01 - Shapes", "Exercicio 1 - Shapes\Exercicio 1 - Shapes.vcxproj", "{F2E18360-51F5-44F2-A558-D611EE456498}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Exercicio 02 - Gravity", "Exercicio 2 - Gravity\Exercicio 2 - Gravity.vcxproj", "{B6D17BCB-8C1A-4A96-B8B5-1680BB07F51C}"

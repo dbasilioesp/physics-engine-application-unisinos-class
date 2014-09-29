@@ -1,25 +1,16 @@
 #include <cstdio>
 #include <iostream>
 #include <vector>
+#include <string>
 #include <GL/glut.h>
 #include "Render.h"
 #include "ForceFunctions.h"
 #include "WorldObjects.h"
+#include "Laucher.h"
 
 
 using namespace std;
 
-
-struct Laucher {
-	Laucher(){
-		x = -80.0f;
-		y = -35.0f;
-		angle = 45.0;
-	}
-	float32 x;
-	float32 y;
-	float32 angle;
-};
 
 class MyContactListener : public b2ContactListener
 {
@@ -40,7 +31,7 @@ int32 velocityIterations;
 int32 positionIterations;
 DebugDraw renderer;
 Laucher laucher;
-MyContactListener contactListener;
+MyContactListener listener;
 vector <b2Body *> birds;
 vector <b2Body *> pigs;
 vector <float> pigsHealth;
@@ -53,7 +44,7 @@ int score;
 int highscore;
 
 
-void Phase1(){
+void Stage01(){
 
 	screenGameOver = false;
 	screenWinner = false;
@@ -62,23 +53,23 @@ void Phase1(){
 	score = 0;
 
 	Create4Walls(world, 87.0, 39.5f);
+	
+	b2Body *pig = CreateCircle(world, 25.0, -39.0, 3.5, 2.0, 0.2, 0.2);
+	
+	BodyUserData *userData = new BodyUserData();
+	userData->entityType = "pig";
+	userData->health = 1.0;
+	pig->SetUserData((void*)userData);
 
-	// 10 Pigs
-	float xi = 0.0;
-	float yi = -36.0;
-	for (int i=0; i < 10;i++)
-	{
-		pigs.push_back(CreateCircle(world, 0.0,yi,3.5,2.0,0.2,0.2));
-		pigsHealth.push_back(1.0); //todos os porquinhos começam saudáveis
-		yi+=7.0; //2*raio do círculo, para posicioná-los corretamente
-	}
+	pigs.push_back(pig);
+	
+	pigsHealth.push_back(1.0);
 
-	pigsToDie.resize(pigs.size());
+	CreateWoodBarTall(world, 0, -29);
 
 }
 
-
-void DrawHeadsUpDisplay(){
+void DrawHud(){
 
 	//Define a cor do texto como preta
 	b2Color color; color.r = 0.0; color.g = 0.0; color.b = 0.0;
@@ -104,10 +95,39 @@ void DrawHeadsUpDisplay(){
 	renderer.DrawString(width-120, 45, color, "Score: %d", score);
 }
 
+void DrawGuideLine()
+{
+	glColor3f(0, 0, 1);
+	b2Vec2 pInicial(laucher.x, laucher.y);
+	b2Vec2 pFinal = CalculaComponentesDoVetor(10.0, laucher.angle);
 
+	glLineWidth(3);
+	glBegin(GL_LINES);
+		glVertex2d(pInicial.x, pInicial.y);
+		glVertex2d(pInicial.x+pFinal.x, pInicial.y+pFinal.y);
+	glEnd();
+	glLineWidth(1);
+}
 
-//Rotina de Callback de redimensionamento da janela 
-void Resize(int32 w, int32 h)
+void StartBox2D()
+{
+	// Define the gravity vector.
+	b2Vec2 gravity(0.0f, -9.8f);
+
+	// Inicializa a biblioteca Box2D
+	world = new b2World(gravity);
+
+	world->SetContactListener(&listener);
+
+	// Define os parâmetro para a simulação
+	// Quanto maior, mais preciso, porém, mais lento
+    velocityIterations = 8;
+    positionIterations = 3;
+	timeStep = 1.0f / 60.0f;
+		
+}
+
+void ReshapeFunc(int32 w, int32 h)
 {
 	// Evita a divisao por zero
 	if(h == 0) h = 1;
@@ -131,43 +151,16 @@ void Resize(int32 w, int32 h)
 		gluOrtho2D (-40.0f*width/height, 40.0f*width/height, -40.0f, 40.0f);
 }
 
-//Função de inicialização da Box2D
-void InitBox2D()
-{
-	// Define the gravity vector.
-	b2Vec2 gravity(0.0f, -9.8f);
-
-	// Inicializa a biblioteca Box2D
-	world = new b2World(gravity);
-
-	// Define os parâmetro para a simulação
-	// Quanto maior, mais preciso, porém, mais lento
-    velocityIterations = 8;
-    positionIterations = 3;
-	timeStep = 1.0f / 60.0f;
-		
-}
-
-// Função de Execução da Simulação
-void RunBox2D()
-{
-	world->Step(timeStep, velocityIterations, positionIterations);
-	world->ClearForces();
-}
-
-
 void ResetGame(){
 	world->~b2World();
 	world = NULL;
-	InitBox2D();
+	StartBox2D();
 	birds.clear();
 	pigs.clear();
 	pigsHealth.clear();
 	pigsToDie.clear();
 }
 
-
-// Callback de temporizador da GLUT (pra não ficar muito rápido)
 void Timer(int)
 {
 	if (!world)
@@ -177,26 +170,8 @@ void Timer(int)
 	glutTimerFunc(framePeriod, Timer, 1);
 }
 
-
-void DrawGuideLine()
-{
-	glColor3f(0, 0, 1);
-	b2Vec2 pInicial(laucher.x, laucher.y);
-	b2Vec2 pFinal = CalculaComponentesDoVetor(10.0, laucher.angle);
-
-	glLineWidth(3);
-	glBegin(GL_LINES);
-		glVertex2d(pInicial.x, pInicial.y);
-		glVertex2d(pInicial.x+pFinal.x, pInicial.y+pFinal.y);
-	glEnd();
-	glLineWidth(1);
-}
-
-
-//Callback de desenho da GLUT, nela é chamada a rotina que chama o passo da simulação
 void SimulationLoop()
 {
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -204,21 +179,17 @@ void SimulationLoop()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	//Chama a rotina que chama o passo da simulação
-	RunBox2D();
+	world->Step(timeStep, velocityIterations, positionIterations);
+	world->ClearForces();
 
-	DrawHeadsUpDisplay();
+	DrawHud();
 
-	if(birds.size() > 0)
-		cout << "Angular Velocity: " << birds[birds.size()-1]->GetAngularVelocity() << endl;
-	
 	if(birds.size() >= maxBirds && pigs.size() > deadPigsCount && !birds[birds.size()-1]->IsAwake()){
 		screenGameOver = true;
 	}
 
 	b2Color color;
 
-	//Define a cor dos objetos como vermelha
 	color.r = 1.0; color.g = 0.0; color.b = 0.0;
 	b2Body *b;
 	for(b = world->GetBodyList(); b; b=b->GetNext()){
@@ -252,14 +223,6 @@ void SimulationLoop()
 		contact = contact->GetNext();
 	}
 
-	// Contacts between birds and pigs
-	contact = world->GetContactList();
-	for (int i=0; i < world->GetContactCount(); i++)
-	{
-		contactListener.BeginContact(contact);
-		contact = contact->GetNext();
-	}
-
 	// Destroy dead pigs
 	for(int i=0; i < pigsToDie.size(); i++)
 	{
@@ -275,7 +238,6 @@ void SimulationLoop()
 	glutSwapBuffers();
 }
 
-//Rotina de callback de teclado da GLUT
 void Keyboard(unsigned char key, int x, int y)
 {
 	switch (key)
@@ -284,7 +246,11 @@ void Keyboard(unsigned char key, int x, int y)
 	{
 		if(birds.size() < maxBirds){
 			//Criando um passarinho...
-			birds.push_back(CreateCircle(world, laucher.x, laucher.y, 2.0, 1.0, 0.5, 0.5));
+
+			BodyUserData *userData = new BodyUserData();
+			userData->entityType = "bird";
+
+			birds.push_back(CreateCircle(world, laucher.x, laucher.y, 2.0, 1.0, 0.5, 0.5, userData));
 		
 			//Aplicando uma força inicial nele...
 			b2Vec2 force;
@@ -308,7 +274,7 @@ void Keyboard(unsigned char key, int x, int y)
 
 	case 'r':
 		ResetGame();
-		Phase1();
+		Stage01();
 		break;
 
 	//Sai do programa
@@ -322,26 +288,6 @@ void Keyboard(unsigned char key, int x, int y)
 
 }
 
-//Rotina que converte coordenadas de tela em coordenadas do mundo
-b2Vec2 ConvertScreenToWorld(int32 x, int32 y)
-{
-	float32 u = x / float32(width);
-	float32 v = (height - y) / float32(height);
-
-	float32 ratio = float32(width) / float32(height);
-	b2Vec2 extents(ratio * 40.0f, 40.0f); //aqui tá no braço
-	//extents *= viewZoom;
-
-	b2Vec2 lower = -extents;
-	b2Vec2 upper = extents;
-
-	b2Vec2 p;
-	p.x = (1.0f - u) * lower.x + u * upper.x;
-	p.y = (1.0f - v) * lower.y + v * upper.y;
-	return p;
-}
-
-
 int main(int argc, char** argv)
 {
 	char title[32];
@@ -352,16 +298,12 @@ int main(int argc, char** argv)
 	glutInitWindowSize(width, height);
 	mainWindow = glutCreateWindow(title);
 	glutDisplayFunc(SimulationLoop);
-	glutReshapeFunc(Resize);
+	glutReshapeFunc(ReshapeFunc);
 	glutKeyboardFunc(Keyboard);
 	glutTimerFunc(framePeriod, Timer, 1);
 
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	
-	//Rotina com a inicialização do mundo
-	InitBox2D();
-
-	Phase1();
+	StartBox2D();
+	Stage01();
 
 	glutMainLoop();
 
@@ -369,31 +311,40 @@ int main(int argc, char** argv)
 }
 
 
-
 void MyContactListener::BeginContact(b2Contact* contact)
 {
+	b2Body *pigA = NULL, 
+		   *pigB = NULL;
+	b2Body *birdA = NULL,
+		   *birdB = NULL;
+	b2Body *scenaryObjectA = NULL,
+		   *scenaryObjectB = NULL;
 	b2Body *bodyA, *bodyB;
+
 	bodyA = contact->GetFixtureA()->GetBody();
 	bodyB = contact->GetFixtureB()->GetBody();
 
+	BodyUserData* userDataA = (BodyUserData*)bodyA->GetUserData();
+	BodyUserData* userDataB = (BodyUserData*)bodyB->GetUserData();
+
+	if(userDataA->entityType == "bird") birdB = bodyA;
+	if(userDataB->entityType == "bird") birdB = bodyB;
+	if(userDataA->entityType == "pig")  pigA = bodyA;
+	if(userDataB->entityType == "pig")  pigA = bodyB;
+	
 	char typeA = 'c'; //cenario
 	char typeB = 'c'; //cenario
 	
 	float birdVelocity;
 
-	for(int j=0; j < birds.size(); j++){
-			
-		if (bodyA == birds[j]){
-			typeA = 'b'; //bird
-			b2Vec2 v = birds[j]->GetLinearVelocity();
-			birdVelocity = sqrt(v.x*v.x+v.y*v.y);
-		}
+	if (birdA != NULL){
+		b2Vec2 v = birdA->GetLinearVelocity();
+		birdVelocity = sqrt(v.x*v.x+v.y*v.y);
+	}
 
-		if (bodyB == birds[j]){
-			typeB = 'b'; //bird
-			b2Vec2 v = birds[j]->GetLinearVelocity();
-			birdVelocity = sqrt(v.x*v.x + v.y*v.y);
-		}
+	if (birdB != NULL){
+		b2Vec2 v = birdB->GetLinearVelocity();
+		birdVelocity = sqrt(v.x*v.x+v.y*v.y);
 	}
 
 	int pigIndex = -1;
@@ -415,7 +366,7 @@ void MyContactListener::BeginContact(b2Contact* contact)
 	// Provoca dano no porco
 	if( (typeA == 'b'  && typeB == 'p') || (typeB == 'b'  && typeA == 'p')){
 
-		pigsHealth[pigIndex] -= 0.025;
+		pigsHealth[pigIndex] -= 0.25;
 
 		if (pigsHealth[pigIndex] < 0.0){
 			//acabou a saude, mata porco

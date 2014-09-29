@@ -67,6 +67,7 @@ b2Body *CreateCircle(b2World *world, float posX, float posY, float32 radius,
 	b2BodyDef bodyDef;
 	bodyDef.position.Set(posX, posY);
 	bodyDef.type = b2_dynamicBody;
+	bodyDef.angularDamping = 1.0;
 
 	b2CircleShape shape;
 	shape.m_radius = radius;
