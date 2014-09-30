@@ -49,7 +49,7 @@ void Stage01(){
 	screenGameOver = false;
 	screenWinner = false;
 	deadPigsCount = 0;
-	maxBirds = 1;
+	maxBirds = 2;
 	score = 0;
 
 	Create4Walls(world, 87.0, 39.5f);
@@ -65,8 +65,7 @@ void Stage01(){
 	
 	pigsHealth.push_back(1.0);
 
-	CreateWoodBarTall(world, 0, -29);
-
+	// CreateWoodBarTall(world, 0, -29);
 }
 
 void DrawHud(){
@@ -234,6 +233,19 @@ void SimulationLoop()
 			deadPigsCount++;
 		}
 	}
+
+	for(int i=0; i < pigs.size(); i++)
+	{
+		if(pigs[i] != NULL){
+			BodyUserData *userData = (BodyUserData*)pigs[i]->GetUserData();
+			if(userData->health <= 0.0){
+				world->DestroyBody(pigs[i]);
+				pigs[i] = NULL;
+				deadPigsCount++;
+			}
+		}
+	}
+
 	
 	glutSwapBuffers();
 }
@@ -349,29 +361,39 @@ void MyContactListener::BeginContact(b2Contact* contact)
 
 	int pigIndex = -1;
 
-	for(int j=0; j < pigs.size(); j++)
-	{
-		if (pigs[j]) {
-			if (bodyA == pigs[j]) {
-				typeA = 'p'; //pig
-				pigIndex = j;
-			}
-			if (bodyB == pigs[j]) {
-				typeB = 'p'; //pig
-				pigIndex = j;
-			}
-		}
+	//for(int j=0; j < pigs.size(); j++)
+	//{
+	//	if (pigs[j]) {
+	//		if (bodyA == pigs[j]) {
+	//			typeA = 'p'; //pig
+	//			pigIndex = j;
+	//		}
+	//		if (bodyB == pigs[j]) {
+	//			typeB = 'p'; //pig
+	//			pigIndex = j;
+	//		}
+	//	}
+	//}
+
+	if(pigA != NULL && birdB != NULL){
+		userDataA->health -= 1.00;
+		score += 5000;
+	}
+
+	if(pigB != NULL && birdA != NULL){
+		userDataB->health -= 1.00;
+		score += 5000;
 	}
 
 	// Provoca dano no porco
-	if( (typeA == 'b'  && typeB == 'p') || (typeB == 'b'  && typeA == 'p')){
+	//if( (typeA == 'b'  && typeB == 'p') || (typeB == 'b'  && typeA == 'p')){
 
-		pigsHealth[pigIndex] -= 0.25;
+		//pigsHealth[pigIndex] -= 0.25;
 
-		if (pigsHealth[pigIndex] < 0.0){
-			//acabou a saude, mata porco
-			pigsToDie.push_back(pigIndex);
-			score += 5000;
-		}
-	}
+		//if (pigsHealth[pigIndex] < 0.0){
+		//	//acabou a saude, mata porco
+		//	pigsToDie.push_back(pigIndex);
+		//	score += 5000;
+		//}
+	//}
 }
