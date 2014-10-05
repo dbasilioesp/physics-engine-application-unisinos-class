@@ -11,8 +11,6 @@ b2Body *CreateBox(b2World *world, float posX, float posY, float width, float hei
 b2Body *CreateCircle(b2World *world, float posX, float posY, float32 radius=5.0, 
 					 float32 density=10.0, float32 friction=0.5, float32 restitution=0.5, BodyUserData *userData = NULL);
 
-b2Body *CreateWoodBarTall(b2World *world, float posX, float posY, 
-					 float32 density=3.0, float32 friction=0.4, float32 restitution=0.5, BodyUserData *userData = NULL);
+b2Body *CreateWoodBarTall(b2World *world, float posX, float posY, BodyUserData *userData = NULL);
 
-b2Body *CreateWoordBarLarge(b2World *world, float posX, float posY, 
-					 float32 density=3.0, float32 friction=0.4, float32 restitution=0.5, BodyUserData *userData = NULL);
+b2Body *CreateWoordBarLarge(b2World *world, float posX, float posY, BodyUserData *userData = NULL);

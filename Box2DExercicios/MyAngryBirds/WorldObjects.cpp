@@ -68,6 +68,7 @@ b2Body *CreateBox(b2World *world, float posX, float posY, float width, float hei
 	if(userData == NULL){
 		userData = new BodyUserData();
 		userData->entityType = "object";
+		userData->health = 1.00;
 	}
 
 	object->SetUserData((void*)userData);
@@ -101,6 +102,7 @@ b2Body *CreateCircle(b2World *world, float posX, float posY, float32 radius,
 	if(userData == NULL){
 		userData = new BodyUserData();
 		userData->entityType = "object";
+		userData->health = 1.00;
 	}
 
 	circle->SetUserData((void*)userData);
@@ -109,14 +111,14 @@ b2Body *CreateCircle(b2World *world, float posX, float posY, float32 radius,
 }
 
 
-b2Body *CreateWoodBarTall(b2World *world, float posX, float posY, 
-					 float32 density, float32 friction, float32 restitution, BodyUserData *userData)
+b2Body *CreateWoodBarTall(b2World *world, float posX, float posY, BodyUserData *userData)
 {
-	b2Body *object = CreateBox(world, posX, posY, 3, 25, density, friction, restitution);
+	b2Body *object = CreateBox(world, posX, posY, 3, 25, 0.25, 0.4, 0.5);
 	
 	if(userData == NULL){
 		userData = new BodyUserData();
 		userData->entityType = "object";
+		userData->health = 2.00;
 	}
 
 	object->SetUserData((void*)userData);
@@ -125,14 +127,14 @@ b2Body *CreateWoodBarTall(b2World *world, float posX, float posY,
 }
 
 
-b2Body *CreateWoodBarLarge(b2World *world, float posX, float posY, 
-					 float32 density, float32 friction, float32 restitution, BodyUserData *userData)
+b2Body *CreateWoodBarLarge(b2World *world, float posX, float posY, BodyUserData *userData)
 {
-	b2Body *object = CreateBox(world, posX, posY, 25, 3, density, friction, restitution);
+	b2Body *object = CreateBox(world, posX, posY, 25, 3, 0.25, 0.4, 0.5);
 	
 	if(userData == NULL){
 		userData = new BodyUserData();
 		userData->entityType = "object";
+		userData->health = 1.00;
 	}
 
 	object->SetUserData((void*)userData);
