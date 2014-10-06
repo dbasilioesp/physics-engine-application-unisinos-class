@@ -32,5 +32,8 @@
     <ClInclude Include="Laucher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ScoreScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

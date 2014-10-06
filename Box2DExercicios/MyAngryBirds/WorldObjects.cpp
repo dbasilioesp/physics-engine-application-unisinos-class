@@ -118,7 +118,7 @@ b2Body *CreateWoodBarTall(b2World *world, float posX, float posY, BodyUserData *
 	if(userData == NULL){
 		userData = new BodyUserData();
 		userData->entityType = "object";
-		userData->health = 2.00;
+		userData->health = 3.00;
 	}
 
 	object->SetUserData((void*)userData);
@@ -134,7 +134,7 @@ b2Body *CreateWoodBarLarge(b2World *world, float posX, float posY, BodyUserData 
 	if(userData == NULL){
 		userData = new BodyUserData();
 		userData->entityType = "object";
-		userData->health = 1.00;
+		userData->health = 3.00;
 	}
 
 	object->SetUserData((void*)userData);

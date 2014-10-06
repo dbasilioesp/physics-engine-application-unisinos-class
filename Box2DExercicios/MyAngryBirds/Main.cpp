@@ -3,10 +3,12 @@
 #include <vector>
 #include <string>
 #include <GL/glut.h>
+#include <Box2D/Box2D.h>
 #include "Render.h"
 #include "ForceFunctions.h"
 #include "WorldObjects.h"
 #include "Laucher.h"
+#include "ScoreScreen.h"
 
 using namespace std;
 
@@ -18,6 +20,7 @@ public:
 	void EndContact(b2Contact* contact){ /* handle end event */ }
 	void PreSolve(b2Contact* contact, const b2Manifold* oldManifold){ /* handle pre-solve event */ }
 	void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse){ /* handle post-solve event */ }
+	void TakingDamage(b2Body* attacker, b2Body* other);
 };
 
 
@@ -33,6 +36,7 @@ Laucher laucher;
 MyContactListener listener;
 vector <b2Body *> birds;
 vector <b2Body *> pigs;
+vector <ScoreScreen*> scoreScreens;
 bool screenGameOver;
 bool screenWinner;
 int deadPigsCount;
@@ -41,12 +45,13 @@ int score;
 int highscore;
 
 b2Body* CreateBird();
-b2Body* CreatePig();
+b2Body* CreatePig(float x, float y);
 void ThrowBird();
 void Stage01();
 void DrawHud();
 void DrawGuideLine();
 void DrawContactPoints();
+void DrawScore();
 void StartBox2D();
 void ReshapeFunc(int32 width, int32 height);
 void ResetGame();
@@ -88,7 +93,7 @@ void Stage01(){
 
 	Create4Walls(world, 87.0, 39.5f);
 	
-	b2Body* pig = CreatePig();
+	b2Body* pig = CreatePig(25.0, -39.0);
 	pigs.push_back(pig);
 	
 	CreateWoodBarTall(world, 0, -29);
@@ -111,9 +116,9 @@ b2Body* CreateBird(){
 }
 
 
-b2Body* CreatePig(){
+b2Body* CreatePig(float x, float y){
 
-	b2Body *pig = CreateCircle(world, 25.0, -39.0, 3.5, 2.0, 0.2, 0.2);
+	b2Body *pig = CreateCircle(world, x, y, 3.5, 2.0, 0.2, 0.2);
 	
 	BodyUserData *userData = new BodyUserData();
 	userData->entityType = "pig";
@@ -135,7 +140,7 @@ void ThrowBird(){
 		birds.push_back(bird);
 		
 		b2Vec2 force;
-		force = CalculaComponentesDoVetor(3000, laucher.angle);
+		force = CalculaComponentesDoVetor(2500, laucher.angle);
 		bird->ApplyForceToCenter(force, true);
 	}
 }
@@ -164,46 +169,68 @@ void MyContactListener::BeginContact(b2Contact* contact)
 	if(userDataA->entityType == "object") objectA = bodyA;
 	if(userDataB->entityType == "object") objectB = bodyB;
 	
-	float birdVelocity;
-
-	if (birdA != NULL){
-		b2Vec2 v = birdA->GetLinearVelocity();
-		birdVelocity = sqrt(v.x*v.x+v.y*v.y);
-	}
-
-	if (birdB != NULL){
-		b2Vec2 v = birdB->GetLinearVelocity();
-		birdVelocity = sqrt(v.x*v.x+v.y*v.y);
-	}
-
 	if(pigA != NULL && birdB != NULL){
-		userDataA->health -= 1.00;
-		score += 5000;
+		TakingDamage(birdB, pigA);
 	}
 
 	if(pigB != NULL && birdA != NULL){
-		userDataB->health -= 1.00;
-		score += 5000;
+		TakingDamage(birdB, pigB);
 	}
 
 	if(objectA != NULL && birdB != NULL){
-		userDataA->health -= 1.00;
-		score += 500;
+		TakingDamage(birdB, objectA);
 	}
 
 	if(objectB != NULL && birdA != NULL){
-		userDataB->health -= 1.00;
-		score += 500;
+		TakingDamage(birdA, objectB);
 	}
 
 	if(objectA != NULL && pigB != NULL){
-		userDataB->health -= 1.00;
-		score += 5000;
+		TakingDamage(objectA, pigB);
 	}
 
 	if(objectB != NULL && pigA != NULL){
-		userDataA->health -= 1.00;
-		score += 5000;
+		TakingDamage(objectB, pigA);
+	}
+
+}
+
+
+void MyContactListener::TakingDamage(b2Body* attacker, b2Body* other){
+
+	float velocity;
+	float density;
+	float damage;
+	int scoreValue = 0;
+	BodyUserData* userDataOther;
+	ScoreScreen *scoreScreen = new ScoreScreen;
+
+	b2Vec2 v = attacker->GetLinearVelocity();
+	velocity = sqrt(v.x*v.x+v.y*v.y);
+	density = attacker->GetFixtureList()->GetDensity();
+	userDataOther = (BodyUserData*) other->GetUserData();
+
+	damage = velocity * density;
+	userDataOther->health -= damage;
+
+	if(userDataOther->entityType == "object"){
+		if(userDataOther->health <= 0.0){
+			scoreValue = 500;
+		}else {
+			scoreValue = (int) damage * 1000;
+		}
+	} else if(userDataOther->entityType == "pig"){
+		if(userDataOther->health <= 0.0){
+			scoreValue = 5000;
+		}
+	}
+
+	score += scoreValue;
+	
+	if(scoreValue > 0){
+		scoreScreen->score = scoreValue;
+		scoreScreen->position = other->GetPosition();
+		scoreScreens.push_back(scoreScreen);
 	}
 
 }
@@ -229,6 +256,8 @@ void SimulationLoop()
 	DrawGuideLine();
 	
 	DrawContactPoints();
+
+	DrawScore();
 	
 	b2Body *node = world->GetBodyList();
 	while(node){
@@ -238,12 +267,12 @@ void SimulationLoop()
 		BodyUserData* userData = (BodyUserData*)body->GetUserData();
 		renderer.DrawFixture(body->GetFixtureList(), userData->color);
 
-		if(userData->health == 0.0){
+		if(userData->health <= 0.0){
 			world->DestroyBody(body);
 			body = NULL;
 		}
 	}
-	
+
 	glutSwapBuffers();
 }
 
@@ -307,6 +336,30 @@ void DrawContactPoints(){
 		
 		contact = contact->GetNext();
 	}
+}
+
+
+void DrawScore(){
+
+	vector<ScoreScreen*>::iterator iter = scoreScreens.begin();
+
+    while (iter != scoreScreens.end()){
+
+		ScoreScreen* scoreScreen = *iter;
+		string strScore;
+
+		scoreScreen = *iter;
+		scoreScreen->duration -= timeStep;
+		strScore = to_string(scoreScreen->score);
+		
+		renderer.DrawString(scoreScreen->position, strScore.c_str());
+
+		if(scoreScreen->duration <= 0.0){
+			iter = scoreScreens.erase(iter);
+        }else{
+           ++iter;
+        }
+    }
 }
 
 
@@ -387,7 +440,6 @@ void Keyboard(unsigned char key, int x, int y)
 	case '-':
 	case 's':
 		laucher.angle -= 5;
-		cout << laucher.angle << "\n";
 		break;
 
 	case 'r':
