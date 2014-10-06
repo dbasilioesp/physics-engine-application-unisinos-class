@@ -105,8 +105,8 @@ void Stage01(){
 	CreateWoodBarTall(world, 30, -29);
 	CreateWoodBarLarge(world, 20, -14);
 
-	CreateRevolvingDoor(world, -10.0, 0);
-	CreateRevolvingDoor(world, -10.0, -25.0);
+	CreateRevolvingDoor(world, -10.0, 0.0);
+	CreateRevolvingDoor(world, -10.0, -25.5);
 }
 
 
