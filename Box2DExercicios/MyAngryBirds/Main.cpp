@@ -88,15 +88,25 @@ void Stage01(){
 	screenGameOver = false;
 	screenWinner = false;
 	deadPigsCount = 0;
-	maxBirds = 2;
+	maxBirds = 3;
 	score = 0;
 
 	Create4Walls(world, 87.0, 39.5f);
 	
-	b2Body* pig = CreatePig(25.0, -39.0);
+	b2Body* pig;
+	
+	pig = CreatePig(20.0, -39.0);
 	pigs.push_back(pig);
 	
-	CreateWoodBarTall(world, 0, -29);
+	pig = CreatePig(20.0, -7.5);
+	pigs.push_back(pig);
+	
+	CreateWoodBarTall(world, 10, -29);
+	CreateWoodBarTall(world, 30, -29);
+	CreateWoodBarLarge(world, 20, -14);
+
+	CreateRevolvingDoor(world, -10.0, 0);
+	CreateRevolvingDoor(world, -10.0, -25.0);
 }
 
 
@@ -206,7 +216,7 @@ void MyContactListener::TakingDamage(b2Body* attacker, b2Body* other){
 	ScoreScreen *scoreScreen = new ScoreScreen;
 
 	b2Vec2 v = attacker->GetLinearVelocity();
-	velocity = sqrt(v.x*v.x+v.y*v.y);
+	velocity = sqrt(v.x*v.x + v.y*v.y);
 	density = attacker->GetFixtureList()->GetDensity();
 	userDataOther = (BodyUserData*) other->GetUserData();
 
@@ -222,6 +232,7 @@ void MyContactListener::TakingDamage(b2Body* attacker, b2Body* other){
 	} else if(userDataOther->entityType == "pig"){
 		if(userDataOther->health <= 0.0){
 			scoreValue = 5000;
+			deadPigsCount += 1;
 		}
 	}
 
@@ -246,9 +257,18 @@ void SimulationLoop()
 	world->Step(timeStep, velocityIterations, positionIterations);
 	world->ClearForces();
 
-	if(birds.size() >= maxBirds && pigs.size() > deadPigsCount 
-	   && !birds[birds.size()-1]->IsAwake()){
-		screenGameOver = true;
+	if(birds.size() >= maxBirds 
+		&& pigs.size() > deadPigsCount){
+
+		b2Vec2 v = birds[birds.size()-1]->GetLinearVelocity();
+		float32 velocity = sqrt(v.x*v.x + v.y*v.y);
+		if(velocity < 0.2){
+			screenGameOver = true;
+		}
+	}
+
+	if(pigs.size() <= deadPigsCount){
+		screenWinner = true;
 	}
 
 	DrawHud();

@@ -113,7 +113,7 @@ b2Body *CreateCircle(b2World *world, float posX, float posY, float32 radius,
 
 b2Body *CreateWoodBarTall(b2World *world, float posX, float posY, BodyUserData *userData)
 {
-	b2Body *object = CreateBox(world, posX, posY, 3, 25, 0.25, 0.4, 0.5);
+	b2Body *object = CreateBox(world, posX, posY, 3.0, 25, 0.25, 0.4, 0.5);
 	
 	if(userData == NULL){
 		userData = new BodyUserData();
@@ -140,4 +140,31 @@ b2Body *CreateWoodBarLarge(b2World *world, float posX, float posY, BodyUserData 
 	object->SetUserData((void*)userData);
 
 	return object;
+}
+
+
+b2Body *CreateRevolvingDoor(b2World *world, float posX, float posY, BodyUserData *userData)
+{
+
+	b2Body *bodyA = CreateBox(world, posX, posY, 1.0, 1.0, 1.0, 0.5, 0.5);
+	b2Body *bodyB = CreateBox(world, posX, posY, 2.0, 20.0, 1.0, 0.5, 0.5);
+
+	bodyA->SetType(b2_staticBody);
+
+	b2RevoluteJointDef rJointDef;
+	rJointDef.bodyA = bodyA;
+	rJointDef.bodyB = bodyB;
+	rJointDef.collideConnected = false;
+
+	world->CreateJoint(&rJointDef);
+	
+	if(userData == NULL){
+		userData = new BodyUserData();
+		userData->entityType = "scenary";
+	}
+
+	bodyA->SetUserData((void*)userData);
+	bodyB->SetUserData((void*)userData);
+
+	return bodyA;
 }
