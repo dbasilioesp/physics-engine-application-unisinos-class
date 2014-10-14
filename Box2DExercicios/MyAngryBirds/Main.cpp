@@ -172,7 +172,7 @@ void MyContactListener::BeginContact(b2Contact* contact)
 	BodyUserData* userDataA = (BodyUserData*)bodyA->GetUserData();
 	BodyUserData* userDataB = (BodyUserData*)bodyB->GetUserData();
 
-	if(userDataA->entityType == "bird") birdB = bodyA;
+	if(userDataA->entityType == "bird") birdA = bodyA;
 	if(userDataB->entityType == "bird") birdB = bodyB;
 	if(userDataA->entityType == "pig")  pigA = bodyA;
 	if(userDataB->entityType == "pig")  pigB = bodyB;

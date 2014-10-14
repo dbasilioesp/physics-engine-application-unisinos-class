@@ -134,6 +134,8 @@ void SimulationLoop()
 	{
 		renderer.DrawFixture(b->GetFixtureList(),color);
 	}
+
+	renderer.DrawString(10, 20, "Press b");
 		
 	glutSwapBuffers();
 

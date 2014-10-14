@@ -138,9 +138,7 @@ void SimulationLoop()
 		renderer.DrawFixture(b->GetFixtureList(),color);
 	}
 
-	ostringstream aux1;  //incluir sstream
-	aux1 << "Comandos: b";
-	renderer.DrawString(10,20,aux1.str().c_str());
+	renderer.DrawString(10, 20, "Press b");
 	
 	glutSwapBuffers();
 }

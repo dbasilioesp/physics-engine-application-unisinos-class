@@ -85,6 +85,11 @@ void SimulationLoop()
 	{
 		renderer.DrawFixture(b->GetFixtureList(),color);
 	}
+
+	renderer.DrawString(10, 20, "[b] Box");
+	renderer.DrawString(10, 40, "[c] Circle");
+	renderer.DrawString(10, 60, "[w,a,s,d] Move");
+	renderer.DrawString(10, 80, "[n] Next");
 		
 	glutSwapBuffers();
 
