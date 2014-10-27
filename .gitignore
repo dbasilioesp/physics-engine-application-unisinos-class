@@ -176,3 +176,4 @@ FakesAssemblies/
 .DS_Store
 Box2D
 GLUT
+PhysX
