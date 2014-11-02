@@ -424,7 +424,7 @@ void RenderSpacedBitmapString(int x, int y, int spacing, void *font, char *strin
 
 void DrawAxes()
 {
-	glPopMatrix();
+	glPushMatrix();
 	glColor3f(0, 0, 1);
 	
 	glPushMatrix();
