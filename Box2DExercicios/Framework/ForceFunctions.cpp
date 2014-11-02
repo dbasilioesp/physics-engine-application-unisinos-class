@@ -52,3 +52,21 @@ b2Vec2 CalculaComponentesDoVetor(float magnitude, float angulo)
 	b2Vec2 vec(vx,vy);
 	return vec;
 }
+
+
+b2Vec2 ConvertScreenToWorld(int32 x, int32 y, int width, int height)
+{
+	float32 u = x / float32(width);
+	float32 v = (height - y) / float32(height);
+
+	float32 ratio = float32(width) / float32(height);
+	b2Vec2 extents(ratio * 40.0f, 40.0f); 
+	
+	b2Vec2 lower = -extents;
+	b2Vec2 upper = extents;
+
+	b2Vec2 p;
+	p.x = (1.0f - u) * lower.x + u * upper.x;
+	p.y = (1.0f - v) * lower.y + v * upper.y;
+	return p;
+}

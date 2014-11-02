@@ -11,6 +11,15 @@
 using namespace std;
 
 
+class MyContactListener : public b2ContactListener
+{
+public:
+	void BeginContact(b2Contact* contact);
+	void EndContact(b2Contact* contact){ /* handle end event */ }
+	void PreSolve(b2Contact* contact, const b2Manifold* oldManifold){ /* handle pre-solve event */ }
+	void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse){ /* handle post-solve event */ }
+};
+
 int32 mainWindow;
 int height=450, width=450;
 b2World *world;
@@ -29,70 +38,6 @@ vector <int> pigsToDieIndexes;
 int deadPigsCount = 0;
 float angle = 45;
 b2Body *ground;
-
-
-class MyContactListener : public b2ContactListener
-{
-public:
-	void BeginContact(b2Contact* contact)
-	{ 
-		b2Body *bodyA, *bodyB;
-		bodyA = contact->GetFixtureA()->GetBody();
-		bodyB = contact->GetFixtureB()->GetBody();
-
-		char typeA = 'c'; //cenario
-		char typeB = 'c'; //cenario
-	
-		float birdVelocity;
-
-		for(int j=0; j < birds.size(); j++){
-			
-			if (bodyA == birds[j]){
-				typeA = 'b'; //bird
-				b2Vec2 v = birds[j]->GetLinearVelocity();
-				birdVelocity = sqrt(v.x*v.x+v.y*v.y);
-			}
-
-			if (bodyB == birds[j]){
-				typeB = 'b'; //bird
-				b2Vec2 v = birds[j]->GetLinearVelocity();
-				birdVelocity = sqrt(v.x*v.x + v.y*v.y);
-			}
-		}
-
-		int pigIndex = -1;
-
-		for(int j=0; j < pigs.size(); j++)
-		{
-			if (pigs[j]) {
-				if (bodyA == pigs[j]) {
-					typeA = 'p'; //pig
-					pigIndex = j;
-				}
-				if (bodyB == pigs[j]) {
-					typeB = 'p'; //pig
-					pigIndex = j;
-				}
-			}
-		}
-
-		// Provoca dano no porco
-		if( (typeA == 'b'  && typeB == 'p') || (typeB == 'b'  && typeA == 'p')){
-			
-			pigsHealth[pigIndex] -= 0.25;
-
-			if (pigsHealth[pigIndex] < 0.0){
-				//acabou a saude, mata porco
-				pigsToDieIndexes.push_back(pigIndex);
-			}
-		}
-
-	}
-	void EndContact(b2Contact* contact){ /* handle end event */ }
-	void PreSolve(b2Contact* contact, const b2Manifold* oldManifold){ /* handle pre-solve event */ }
-	void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse){ /* handle post-solve event */ }
-};
-
 MyContactListener contactListener;
 
 
@@ -157,18 +102,6 @@ b2Body *CreateCircle(float posX, float posY, float raio, float massa, float coef
 	return objeto;
 }
 
-//Rotina que habilita uma textura na OpenGL
-void EnableTextureInOpenGL(Texture *texture)
-{
-	// Associa a textura aos comandos seguintes
-	glBindTexture(GL_TEXTURE_2D, texture->id);
-	// Envia a textura para OpenGL, usando o formato RGB
-	glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture->pixels);
-	// Ajusta os filtros iniciais para a textura
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-}
-
 //Rotina para desenhar um sprite
 void DrawSprite(float size, float posX, float posY, float posZ, float angle)
 {
@@ -215,6 +148,71 @@ Texture *CreateTexture(char *filename)
 	glGenTextures(1, &texture->id);
 	
 	return texture;
+}
+
+// 
+void MyContactListener::BeginContact(b2Contact* contact)
+{ 
+	b2Body *bodyA, *bodyB;
+	bodyA = contact->GetFixtureA()->GetBody();
+	bodyB = contact->GetFixtureB()->GetBody();
+
+	char typeA = 'c'; //cenario
+	char typeB = 'c'; //cenario
+	
+	float birdVelocity;
+
+	for(int j=0; j < birds.size(); j++){
+		if (bodyA == birds[j]){
+			typeA = 'b'; //bird
+			b2Vec2 v = birds[j]->GetLinearVelocity();
+			birdVelocity = sqrt(v.x*v.x+v.y*v.y);
+		}
+		if (bodyB == birds[j]){
+			typeB = 'b'; //bird
+			b2Vec2 v = birds[j]->GetLinearVelocity();
+			birdVelocity = sqrt(v.x*v.x + v.y*v.y);
+		}
+	}
+
+	int pigIndex = -1;
+
+	for(int j=0; j < pigs.size(); j++){
+		if (pigs[j]) {
+			if (bodyA == pigs[j]) {
+				typeA = 'p'; //pig
+				pigIndex = j;
+			}
+			if (bodyB == pigs[j]) {
+				typeB = 'p'; //pig
+				pigIndex = j;
+			}
+		}
+	}
+
+	// Provoca dano no porco
+	if( (typeA == 'b'  && typeB == 'p') 
+			|| (typeB == 'b'  && typeA == 'p')){
+		
+		pigsHealth[pigIndex] -= 0.25;
+		if (pigsHealth[pigIndex] < 0.0){
+			// acabou a saude, mata porco
+			pigsToDieIndexes.push_back(pigIndex);
+		}
+	}
+
+}
+
+//Rotina que habilita uma textura na OpenGL
+void EnableTextureInOpenGL(Texture *texture)
+{
+	// Associa a textura aos comandos seguintes
+	glBindTexture(GL_TEXTURE_2D, texture->id);
+	// Envia a textura para OpenGL, usando o formato RGB
+	glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture->pixels);
+	// Ajusta os filtros iniciais para a textura
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
 // Função responsável por inicializar parâmetros e variáveis
