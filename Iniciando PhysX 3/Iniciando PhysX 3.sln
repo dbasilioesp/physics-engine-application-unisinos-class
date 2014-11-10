@@ -1,7 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Iniciando PhysX 3", "Iniciando PhysX 3.vcxproj", "{FF88FFF9-34CF-4DCB-A5C9-29F6751D22BA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Iniciando PhysX 3", "Iniciando PhysX 3\Iniciando PhysX 3.vcxproj", "{D3F782A1-DF77-407E-930A-3F687A7ED2A1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhysX Domino", "PhysX Domino\PhysX Domino.vcxproj", "{A3AC1435-28B4-4C2C-8A51-47C53B3541DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +11,14 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FF88FFF9-34CF-4DCB-A5C9-29F6751D22BA}.Debug|Win32.ActiveCfg = Debug|Win32
-		{FF88FFF9-34CF-4DCB-A5C9-29F6751D22BA}.Debug|Win32.Build.0 = Debug|Win32
-		{FF88FFF9-34CF-4DCB-A5C9-29F6751D22BA}.Release|Win32.ActiveCfg = Release|Win32
-		{FF88FFF9-34CF-4DCB-A5C9-29F6751D22BA}.Release|Win32.Build.0 = Release|Win32
+		{D3F782A1-DF77-407E-930A-3F687A7ED2A1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D3F782A1-DF77-407E-930A-3F687A7ED2A1}.Debug|Win32.Build.0 = Debug|Win32
+		{D3F782A1-DF77-407E-930A-3F687A7ED2A1}.Release|Win32.ActiveCfg = Release|Win32
+		{D3F782A1-DF77-407E-930A-3F687A7ED2A1}.Release|Win32.Build.0 = Release|Win32
+		{A3AC1435-28B4-4C2C-8A51-47C53B3541DE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A3AC1435-28B4-4C2C-8A51-47C53B3541DE}.Debug|Win32.Build.0 = Debug|Win32
+		{A3AC1435-28B4-4C2C-8A51-47C53B3541DE}.Release|Win32.ActiveCfg = Release|Win32
+		{A3AC1435-28B4-4C2C-8A51-47C53B3541DE}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

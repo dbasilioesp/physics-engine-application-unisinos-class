@@ -35,13 +35,13 @@ static PxSimulationFilterShader gDefaultFilterShader = PxDefaultSimulationFilter
 
 typedef GLfloat point3[3];
 
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 600;
 PxScene *gScene = NULL;
 PxReal myTimestep = 1.0f/60.0f;
 int startTime = 0;
 int totalFrames = 0;
 float fps = 0;
-const int WINDOW_WIDTH = 800;
-const int WINDOW_HEIGHT = 600;
 char buffer[MAX_PATH];
 int state = 1;
 int oldX = 0;
@@ -59,6 +59,7 @@ const float globalGravity = -9.8;
 const int objectsCount = 150;
 vector<PxRigidActor*> boxes;
 vector<PxRigidActor*> spheres;
+vector<PxRigidStatic*> sceneObjects;
 GLfloat lightAmbientColour[] = {0.4f, 0.4f, 0.4f, 1.0f};
 GLfloat lightDiffuseColour[] = {0.8f, 0.8f, 0.8f, 1.0f};
 GLfloat lightSpecularColour[] = {0.8f, 0.8f, 0.8f, 1.0f};
@@ -138,7 +139,6 @@ void InitializePhysX()
 
 	gScene = gPhysicsSDK->createScene(sceneDesc);
 
-
 	PxMaterial *planeMaterial = gPhysicsSDK->createMaterial(0.9f, 0.1f, 1.0f);
 	PxMaterial *cubeMaterial = gPhysicsSDK->createMaterial(0.1f, 0.4f, 1.0f);
 	PxMaterial *sphereMaterial = gPhysicsSDK->createMaterial(0.6f, 0.1f, 0.6f);
@@ -148,8 +148,9 @@ void InitializePhysX()
 	PxRigidStatic *plane = gPhysicsSDK->createRigidStatic(pose);
 	PxShape *shape = plane->createShape(PxPlaneGeometry(), *planeMaterial);
 	gScene->addActor(*plane);
+	sceneObjects.push_back(plane);
 
-	PxTransform leftPose = PxTransform(PxVec3(0.0f, 0.0f, 10.0f),
+	/*PxTransform leftPose = PxTransform(PxVec3(0.0f, 0.0f, 10.0f),
 									   PxQuat(PxHalfPi, PxVec3(0.0f, 1.0f, 0.0f)));
 	PxRigidStatic *leftPlane = gPhysicsSDK->createRigidStatic(leftPose);
 	PxShape *leftShape = leftPlane->createShape(PxPlaneGeometry(), *planeMaterial);
@@ -168,28 +169,28 @@ void InitializePhysX()
 	gScene->addActor(*leftPlane2);
 
 	PxTransform rightPose2 = PxTransform(PxVec3(10.0f, 0.0f, 0.0f),
-									   PxQuat(PxHalfPi, PxVec3(0.0f, 1.0f, 0.0f)));
+									     PxQuat(PxPi, PxVec3(0.0f, 1.0f, 0.0f)));
 	PxRigidStatic *rightPlane2 = gPhysicsSDK->createRigidStatic(rightPose2);
 	PxShape *rightShape2 = rightPlane2->createShape(PxPlaneGeometry(), *planeMaterial);
-	gScene->addActor(*rightPlane2);
+	gScene->addActor(*rightPlane2);*/
 
 	// Cube Actor
 	PxReal cubeDensity = 2.0f;
-	PxTransform cubeTransform(PxVec3(0.0f, 4.0, 0.0f));
+	PxTransform cubeTransform(PxVec3(0.0f, 0.5, 5.0f));
 	PxBoxGeometry cubeGeometry(PxVec3(0.5, 0.5, 0.5));
 
 	PxRigidDynamic *cubeActor = PxCreateDynamic(*gPhysicsSDK, cubeTransform, cubeGeometry, 
 												 *cubeMaterial, cubeDensity);
 
-	cubeActor->setAngularDamping(0.2);
-	cubeActor->setLinearDamping(0.01);
-	cubeActor->setMass(9);
+	cubeActor->setAngularDamping(0.0);
+	cubeActor->setLinearDamping(0.0);
+	cubeActor->setMass(20);
 
 	gScene->addActor(*cubeActor);
 	boxes.push_back(cubeActor);
 
 	// Sphere Actor
-	PxReal sphereDensity = 2.0f;
+	/*PxReal sphereDensity = 2.0f;
 	PxTransform sphereTransform(PxVec3(0.0f, 4.0f, 0.0f));
 	PxSphereGeometry sphereGeometry(0.7f);
 
@@ -201,7 +202,7 @@ void InitializePhysX()
 	sphereActor->setMass(5);
 
 	gScene->addActor(*sphereActor);
-	spheres.push_back(sphereActor);
+	spheres.push_back(sphereActor);*/
 }
 
 
@@ -254,6 +255,8 @@ void OnRender()
 	DrawAxes();
 
 	DrawGrid(10);
+
+	glColor3f(0.7f, 0.7f, 0.7f);
 
 	glPushMatrix();
 	glTranslatef(0, 10, 10);
@@ -311,13 +314,20 @@ void RenderActors()
 	GLfloat matriz_diffuse_cube[] = {0.85f, 0.0f, 0.0f, 1.0f};
 	GLfloat matriz_diffuse_sphere[] = {0.85f, 0.85f, 0.0f, 1.0f};
 	
-	for (int i = 0; i < 1; i++)
-	{
-		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, matriz_diffuse_cube);
-		DrawActor(boxes[i]);
 
-		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, matriz_diffuse_sphere);
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, matriz_diffuse_cube);
+	for (int i = 0; i < boxes.size(); i++){
+		DrawActor(boxes[i]);
+	}
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, matriz_diffuse_sphere);
+	for (int i = 0; i < spheres.size(); i++){
 		DrawActor(spheres[i]);
+	}
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, ambient_cube);
+	for (int i = 0; i < sceneObjects.size(); i++){
+		DrawActor(sceneObjects[i]);
 	}
 
 	glDisable(GL_LIGHTING);
