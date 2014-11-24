@@ -183,13 +183,14 @@ void CreateFirstScene(){
 	}
 
 	// Cube Actor
-	/*PxRigidDynamic *cubeActor = CreateDominoPiece(PxVec3(0.0f, 0.7, 5.0f));
+	cubeActor = CreateDominoPiece(PxVec3(0.0f, 2.7, 5.0f));
 	gScene->addActor(*cubeActor);
 	boxes.push_back(cubeActor);
 
-	cubeActor = CreateDominoPiece(PxVec3(1.0f, 0.7, 5.0f));
-	gScene->addActor(*cubeActor);
-	boxes.push_back(cubeActor);*/
+	cubeActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+	PxRigidBodyExt::addForceAtPos(*cubeActor, PxVec3(10, 0, 0), PxVec3(0, -5, 0));
+	cubeActor->setLinearDamping(0);
+	cubeActor->setAngularDamping(0);
 
 	// Sphere Actor
 	PxRigidDynamic *sphereActor = CreateBall(PxVec3(8.0f, 1.0f, 5.0f));
@@ -197,6 +198,30 @@ void CreateFirstScene(){
 	spheres.push_back(sphereActor);
 
 	sphereActor->addForce(PxVec3(-800.0, 0.0, 0.0));
+
+	PxVec3 pos = PxVec3(0, 5, 3);
+	PxVec3 offset = PxVec3(0, 1.0, 0);
+
+	PxRigidActor *staticActor = PxCreateStatic(*gPhysicsSDK, PxTransform(pos),
+								PxSphereGeometry(0.5), *sphereMaterial);
+
+	PxRigidDynamic *connectedActor = PxCreateDynamic(*gPhysicsSDK, PxTransform(PxVec3(0)),
+									PxBoxGeometry(0.5, 0.05, 2.0), *cubeMaterial, 1.0);
+
+	PxRevoluteJoint *revoluteJoint = PxRevoluteJointCreate(*gPhysicsSDK, 
+					staticActor, PxTransform(offset), connectedActor,
+					PxTransform(-offset));
+	
+	revoluteJoint->setLimit(PxJointAngularLimitPair(-7, 5));
+
+	revoluteJoint->setRevoluteJointFlag(PxRevoluteJointFlag::eLIMIT_ENABLED, true);
+
+	gScene->addActor(*staticActor);
+	spheres.push_back(staticActor);
+	gScene->addActor(*connectedActor);
+	boxes.push_back(connectedActor);
+
+	connectedActor->addForce(PxVec3(0, 500, 500));
 
 }
 
